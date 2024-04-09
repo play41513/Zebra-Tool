@@ -1,0 +1,101 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "MessageBox.h"
+#include "main.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TfrmMsg *frmMsg;
+//---------------------------------------------------------------------------
+__fastcall TfrmMsg::TfrmMsg(TComponent* Owner)
+	: TForm(Owner)
+{
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMsg::FormShow(TObject *Sender)
+{
+	if(frmMsg->Tag == MSG_SCREEN)
+	{
+		plScreenTitle->Caption = frmMsg->Hint + " 畫面是否正常";
+		plKeyboard->Height = 0;
+		plScreen->Height   = 97;
+	}
+	else
+	{
+		plKeyboard->Height = 91;
+		plScreen->Height   = 0;
+		btnNext->Enabled = false;
+		edtHotKey->SetFocus();
+		if(AnsiString(frmMsg->Hint).UpperCase() == "V")
+		{
+			edtHotKey->Text = "輸入指令";
+			btnNext->Width	= 0;
+		}
+		else if(AnsiString(frmMsg->Hint).UpperCase() == "M")
+		{
+			edtHotKey->Text = "輸入完指令，請在輸入M鍵離開畫面";
+			btnNext->Width	= 0;
+		}
+		else if(AnsiString(frmMsg->Hint).UpperCase() == "S")
+		{
+			edtHotKey->Text = "輸入完指令，請等待畫面切換結束按下空白鍵";
+			btnNext->Width	= 136;
+		}
+		else if(AnsiString(frmMsg->Hint).UpperCase() == "L"
+			||AnsiString(frmMsg->Hint).UpperCase() == "R"
+				||AnsiString(frmMsg->Hint).UpperCase() == "2")
+		{
+			edtHotKey->Text = "輸入完指令，畫面切換結束請按下Next鍵";
+			btnNext->Width	= 136;
+		}
+	}
+	frmMsg->Height = 129;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMsg::btnScreenOKClick(TObject *Sender)
+{
+	TBitBtn *btn = (TBitBtn*)Sender;
+	ModalResult = btn->Name.Pos("OK")?mrOk:mrCancel;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TfrmMsg::edtHotKeyChange(TObject *Sender)
+{
+	if(edtHotKey->Text.Length()==0)
+		edtHotKey->Font->Color = clBlue;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMsg::edtHotKeyKeyUp(TObject *Sender, WORD &Key, TShiftState Shift)
+{
+	char sKey = Key;
+	if(AnsiString(Key).ToInt() == 145)
+	{
+	   edtHotKey->Text +="Scroll Lock ";
+	   if(btnNext->Width) btnNext->Enabled = true;
+	}
+	else if(AnsiString(sKey) == AnsiString(frmMsg->Hint))
+	{
+		if(AnsiString(frmMsg->Hint).UpperCase() == "V")
+			frmMain->moDebug->Lines->Add(edtHotKey->Text);
+		edtHotKey->Font->Color = clBlue;
+		frmMsg->Close();
+	}
+	else if(Key==32&&btnNext->Width>0)
+	{
+		btnNext->Click();
+	}
+	else edtHotKey->Font->Color = clRed;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMsg::btnNextClick(TObject *Sender)
+{
+		plScreenTitle->Caption ="畫面是否正常";
+		plKeyboard->Height = 0;
+		plScreen->Height   = 97;
+}
+//---------------------------------------------------------------------------
+

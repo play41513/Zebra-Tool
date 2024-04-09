@@ -1,0 +1,40 @@
+//---------------------------------------------------------------------------
+
+#ifndef LogMsgH
+#define LogMsgH
+#include <queue>
+#include <direct.h>
+#include <fstream.h>
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include "ConstantString.h"
+//---------------------------------------------------------------------------
+typedef struct _LOG_DESCRIPOR
+{
+  TStringList* strList;
+  AnsiString result;
+  AnsiString errorcode;
+
+}LOG_DESCRIPOR;
+
+class cLogMsg
+{
+	private:
+		AnsiString strLogName;
+		AnsiString strLocalLog;
+		AnsiString strErrorMsg;
+		AnsiString strStartTime;
+		AnsiString WNetERROR_MSG;
+		DWORD dwWriteLogCount;
+
+	public:
+		cLogMsg::cLogMsg(void);
+		void AddLocalFilePath(AnsiString ToolName);
+		void WriteLocalLOG(AnsiString Time,bool bPass);
+		void WriteErrorMsg(AnsiString Line);
+		void WriteItemMsg(DWORD ItemIndex,AnsiString ItemName,AnsiString Result);
+
+		LOG_DESCRIPOR LOG_DESC;
+};
+#endif

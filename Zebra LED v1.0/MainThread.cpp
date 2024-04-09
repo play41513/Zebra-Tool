@@ -1,0 +1,570 @@
+//---------------------------------------------------------------------------
+#include <windows.h>    // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <SetupAPI.h> // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <cfgmgr32.h> // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#pragma hdrstop
+#include "MainThread.h"
+#pragma package(smart_init)
+DWORD dwStep,dwTimeOut;
+DWORD dwGetADValueFailCount;
+//---------------------------------------------------------------------------
+
+//   Important: Methods and properties of objects in VCL can only be
+//   used in a method called using Synchronize, for example:
+//
+//      Synchronize(&UpdateCaption);
+//
+//   where UpdateCaption could look like:
+//
+//      void __fastcall TMainThread::UpdateCaption()
+//      {
+//        Form1->Caption = "Updated in a thread";
+//      }
+//---------------------------------------------------------------------------
+
+__fastcall TMainThread::TMainThread(bool CreateSuspended,INI_DESCRIPOR *info,HWND hWnd)
+	: TThread(CreateSuspended)
+{
+	INI_Desc = info;
+	mHwnd	 = hWnd;
+	mPowerSupplyAccess = new PowerSupplyAccess(INI_Desc);
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainThread::Execute()
+{
+	dwStep = STEP_CHECK_HIDBOARD;
+	bool  bError = false;
+	AnsiString strTemp,strErrorMsg;
+	DWORD dwTemp;
+	//---- Place thread code here ----
+	while( !Terminated )
+	{
+		switch(dwStep)
+		{
+			case STEP_THREAD_STOP:
+				break;
+			case STEP_THREAD_WAIT:
+				if(m_hid.ReadHidValue(15))
+				{
+					if(m_hid.AD_VALUE>0)
+					{
+						dwStep = STEP_CHECK_HID_PIN_15;
+						Sleep(500);//每一片間距
+					}
+				}
+				else
+					dwStep = STEP_HIDERROR;
+				break;
+			case STEP_CHECK_HIDBOARD: //WP_UI_ERRORMSG_INVISIBLE
+				if(m_hid.HID_TurnOn())
+				{
+					PostMessage(mHwnd,WM_UI_RESULT,WP_UI_ERRORMSG_INVISIBLE,NULL);
+					dwStep = STEP_CHECK_HID_PIN_15;
+				}
+				else
+					dwStep = STEP_HIDERROR;
+				break;
+			case STEP_CHECK_HID_PIN_15:
+				if(m_hid.ReadHidValue(15))
+				{
+					if(m_hid.AD_VALUE==0)
+					{
+						PostMessage(mHwnd,WM_UI_RESULT,WP_UI_ERRORMSG_INVISIBLE,NULL);
+						for(DWORD i = 0 ; i < INI_Desc->dwPSUSettingCount ; i++)
+							INI_Desc->PITEM_DESCRIPOR[i].TestADItemNum = 0;
+						INI_Desc->dwNowTestItemIndex = 0;
+						PostMessage(mHwnd,WM_UI_RESULT,WP_UI_REFRESH_AD_ITEM,NULL);
+						bError = false;
+						dwStep = STEP_CHECK_PSU;
+					}
+				}
+				else
+                 	dwStep = STEP_HIDERROR;
+				break;
+			case STEP_CHECK_PSU:
+				INI_Desc->queDetail.push("[Start Test]");
+				PostMessage(mHwnd,WM_UI_RESULT,WP_UI_RESULT_TEST,NULL);
+				queThreadVoltageValue.c.clear();
+				queThreadCurrentValue.c.clear();
+				dwCurrentNowPASS[0] = 0;
+				dwCurrentNowPASS[1] = 0;
+				strErrorMsg = "Error";
+				for(DWORD i = 0 ; i < INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].dwPSUCount ; i++)
+				{
+					dwPSUFailCount[i] = 0;
+					mPowerSupplyAccess->SetDeviceIndex(INI_Desc->dwNowTestItemIndex,i);
+					if(!mPowerSupplyAccess->CheckPSUIsOnline())
+						dwStep = STEP_THREAD_PSU_ERROR;
+					Sleep(500);//指令間距
+				}
+				if(dwStep != STEP_THREAD_PSU_ERROR)
+					dwStep = STEP_PSU_OPEN;
+				break;
+			case STEP_PSU_OPEN:
+				INI_Desc->queDetail.push("[PSU Power Open]");
+				for(DWORD i = 0 ; i < INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].dwPSUCount ; i++)
+				{
+					mPowerSupplyAccess->SetDeviceIndex(INI_Desc->dwNowTestItemIndex,i);
+					if(!mPowerSupplyAccess->SetParameter())
+					{
+						dwStep = STEP_HIDERROR;
+                    }
+				}
+				dwTimeOut = GetTickCount()+INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PSU_OutputAfterDelay;
+				dwStep = STEP_PSU_OUTPUT_DELAY;
+				break;
+			case STEP_PSU_OUTPUT_DELAY:
+				if(GetTickCount() >= dwTimeOut)
+                	dwStep = STEP_GET_PSU_VALUE;
+				break;
+			case STEP_GET_PSU_VALUE:
+				for(DWORD i = 0 ; i < INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].dwPSUCount ; i++)
+				{
+					mPowerSupplyAccess->SetDeviceIndex(INI_Desc->dwNowTestItemIndex,i);
+					switch(CheckPSUReturnValue(INI_Desc->dwNowTestItemIndex,i))
+					{
+						case GET_VALUE_CONTINUE:
+							dwCurrentNowPASS[i]++;
+							if(dwCurrentNowPASS[0] >= INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PPSU_DESCRIPOR[0].dwPASSCount
+								&& dwCurrentNowPASS[1] >= INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PPSU_DESCRIPOR[1].dwPASSCount)
+							{
+								INI_Desc->queDetail.push("[Get AD Value]");
+								dwStep = STEP_CHECK_TEST_ITEM;
+							}
+							break;
+						case GET_VALUE_FAIL:
+								dwPSUFailCount[i]++;
+								if(dwPSUFailCount[i] > INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].dwPSUFailCount)
+								{
+									strErrorMsg +=","+MSG_CURRENT_FAIL;
+									dwStep = STEP_THREAD_AD_VALUE_FAIL;
+								}
+							break;
+						case GET_VALUE_ERROR:
+								strErrorMsg +=","+MSG_NOT_FIND_PSU;
+								dwStep = STEP_THREAD_PSU_ERROR;
+							break;
+                    }
+				}
+				break;
+			case STEP_CHECK_TEST_ITEM:
+				if(INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].bTest)
+				{
+					dwGetADValueFailCount = 0;
+					dwStep = STEP_READ_VALUE;
+				}
+				else
+				{
+					INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum++;
+					if(INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum >= 15)
+					{
+						dwStep = STEP_CHECK_NEXT_STEP;
+					}
+				}
+				break;
+			case STEP_READ_VALUE:
+				PostMessage(mHwnd,WM_AD_VALUE_UI,WP_AD_VALUE_UI_TEST,INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum);
+				if(m_hid.ReadHidValue(INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dwADPortNum))
+				{
+					INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dwADValue = m_hid.AD_VALUE.ToInt();
+					dwStep = STEP_ADVALUE_CHANGE_TO_VOLTAGE_VALUE;
+				}
+				else
+					dwStep = STEP_HIDERROR;
+				break;
+			case STEP_ADVALUE_CHANGE_TO_VOLTAGE_VALUE:
+				INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbVoltageValue
+					=	(INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dwADValue
+						* INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbBitVoltage)
+						+ INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbLossVoltage;
+
+				strTemp.sprintf("%.3f",INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbVoltageValue);
+				if((strTemp.ToDouble()-INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbLossVoltage) < 0.3)
+					strTemp = "0";
+				INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbVoltageValue = strTemp.ToDouble();
+
+				dwStep = STEP_CHECK_VOLTAGE_VALUE;
+				break;
+			case STEP_CHECK_VOLTAGE_VALUE:
+				if(INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbVoltageValue
+					> INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbVoltageMax
+					|| INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbVoltageValue
+					< INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].dbVoltageMin)
+				{
+					dwGetADValueFailCount++;
+					if(dwGetADValueFailCount >= 3)
+					{
+						PostMessage(mHwnd,WM_AD_VALUE_UI,WP_AD_VALUE_UI_FAIL,INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum);
+						INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].bPASS = false;
+						strErrorMsg +=","+INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].Name;
+						bError = true;
+						INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum++;
+						dwStep = STEP_CHECK_NEXT_STEP;
+					}
+					else
+                    	dwStep = STEP_READ_VALUE;
+				}
+				else
+				{
+					PostMessage(mHwnd,WM_AD_VALUE_UI,WP_AD_VALUE_UI_PASS,INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum);
+					INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum].bPASS = true;
+					INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum++;
+					dwStep = STEP_CHECK_NEXT_STEP;
+				}
+				break;
+			case STEP_CHECK_NEXT_STEP:
+				if(INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum >= 15)
+				{
+					if(bError)
+					{
+						INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum = 0;
+						dwStep = STEP_THREAD_AD_VALUE_FAIL;
+						break;
+					}
+					INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].TestADItemNum = 0;
+					dwStep = STEP_THREAD_AD_VALUE_PASS;
+				}
+				else
+					dwStep = STEP_CHECK_TEST_ITEM;
+				break;
+			case STEP_THREAD_AD_VALUE_PASS:
+					INI_Desc->queDetail.push("PASS");
+
+					INI_Desc->dwNowTestItemIndex++;
+					if(INI_Desc->dwNowTestItemIndex < INI_Desc->dwPSUSettingCount
+						&& !bError)
+					{
+						dwStep = STEP_THREAD_WAIT_SWITCH_SETTING;
+					}
+					else
+					{
+						INI_Desc->dwNowTestItemIndex--;
+						PostMessage(mHwnd,WM_UI_RESULT,WP_UI_RESULT_PASS,NULL);
+						dwStep = STEP_THREAD_CLOSE_PSU;
+					}
+
+				break;
+			case STEP_THREAD_AD_VALUE_FAIL:
+					INI_Desc->queDetail.push(strErrorMsg);
+					PostMessage(mHwnd,WM_UI_RESULT,WP_UI_RESULT_FAIL,NULL);
+					dwStep = STEP_THREAD_CLOSE_PSU;
+				break;
+			case STEP_THREAD_CLOSE_PSU:
+				INI_Desc->queDetail.push("[PSU Power Close]");
+				for(DWORD i = 0 ; i < INI_Desc->PITEM_DESCRIPOR[0].dwPSUCount ; i++)
+				{
+					mPowerSupplyAccess->SetDeviceIndex(INI_Desc->dwNowTestItemIndex,i);
+					if(!mPowerSupplyAccess->ClosePower())
+					{
+						dwStep = STEP_HIDERROR;      //11276 11301 6623
+                    }
+				}
+				//
+				if(dwStep != STEP_HIDERROR)
+				{
+					dwStep = STEP_THREAD_WAIT;
+				}
+				break;
+			case STEP_THREAD_WAIT_SWITCH_SETTING:
+				if(INI_Desc->PITEM_SWITCH_SETTING.Enable)
+				{
+					PostMessage(mHwnd,WM_UI_RESULT,WP_UI_SWITCH_FORM_VISABLE,1);
+					bSwitchFail = false;
+					dwStep = STEP_THREAD_SWITCH_CHECK_VALUE;
+				}
+				else
+				{
+					PostMessage(mHwnd,WM_UI_RESULT,WP_UI_REFRESH_AD_ITEM,NULL);
+					dwStep = STEP_CHECK_PSU;
+				}
+				break;
+			case STEP_THREAD_SWITCH_CHECK_VALUE:
+				if(m_hid.HID_TurnOn())
+				{
+					if(m_hid.ReadHidValue(INI_Desc->PITEM_SWITCH_SETTING.DetectADIndex))
+					{
+						AnsiString strTemp;
+						AnsiString strTemp1
+							=	((m_hid.AD_VALUE.ToDouble())
+								* INI_Desc->PITEM_DESCRIPOR[0].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_SWITCH_SETTING.DetectADIndex].dbBitVoltage)
+								+ INI_Desc->PITEM_DESCRIPOR[0].PITEM_AD_DESCRIPOR[INI_Desc->PITEM_SWITCH_SETTING.DetectADIndex].dbLossVoltage;
+
+						strTemp.sprintf("%.3f",strTemp1.ToDouble());
+						if(strTemp.ToDouble() > INI_Desc->PITEM_SWITCH_SETTING.DetectADValue)
+						{
+							PostMessage(mHwnd,WM_UI_RESULT,WP_UI_REFRESH_AD_ITEM,NULL);
+							PostMessage(mHwnd,WM_UI_RESULT,WP_UI_SWITCH_FORM_VISABLE,0);
+							dwStep = STEP_CHECK_PSU;
+                        }
+					}
+					Sleep(100);
+					if(bSwitchFail)
+					{
+						strErrorMsg +=","+MSG_SWITCH_FAIL;
+						PostMessage(mHwnd,WM_UI_RESULT,WP_UI_SWITCH_FORM_VISABLE,0);
+						dwStep = STEP_THREAD_AD_VALUE_FAIL;
+					}
+				}
+				else
+				{
+					PostMessage(mHwnd,WM_UI_RESULT,WP_UI_SWITCH_FORM_VISABLE,0);
+					dwStep = STEP_HIDERROR;
+				}
+				break;
+			case STEP_HIDERROR:
+				PostMessage(mHwnd,WM_UI_RESULT,WP_UI_NO_HID_BOARD,NULL);
+				for(DWORD i = 0 ; i < INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].dwPSUCount ; i++)
+				{
+					mPowerSupplyAccess->SetDeviceIndex(INI_Desc->dwNowTestItemIndex,i);
+					mPowerSupplyAccess->ClosePowerSupply();
+					Sleep(500);//指令間距
+				}
+				dwStep = STEP_CHECK_HIDBOARD;
+				break;
+			case STEP_THREAD_PSU_ERROR:
+				PostMessage(mHwnd,WM_UI_RESULT,WP_UI_NO_PSU,NULL);
+				PostMessage(mHwnd,WM_UI_RESULT,WP_UI_RESULT_FAIL,NULL);
+				for(DWORD i = 0 ; i < INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].dwPSUCount ; i++)
+				{
+					mPowerSupplyAccess->SetDeviceIndex(INI_Desc->dwNowTestItemIndex,i);
+					mPowerSupplyAccess->ClosePowerSupply();
+					Sleep(500);//指令間距
+				}
+				dwStep = STEP_THREAD_WAIT;
+				break;
+
+		}
+		Sleep(INI_Desc->dwLoopDelay);
+	}
+}
+double TMainThread::GetADValue(DWORD ADIndex)
+{
+	dwStep = STEP_THREAD_STOP;
+	Sleep(500);
+	if(m_hid.HID_TurnOn())
+	{
+		if(m_hid.ReadHidValue(ADIndex))
+		{
+			dwStep = STEP_THREAD_WAIT;
+			AnsiString strTemp;
+			AnsiString strTemp1
+				=	((m_hid.AD_VALUE.ToDouble())
+					* INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[ADIndex].dbBitVoltage)
+					+ INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[ADIndex].dbLossVoltage;
+
+			strTemp.sprintf("%.3f",strTemp1.ToDouble());
+			if((strTemp.ToDouble()-INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].PITEM_AD_DESCRIPOR[ADIndex].dbLossVoltage) < 0.3)
+				strTemp = "0";
+			return strTemp.ToDouble();
+		}
+
+	}
+	dwStep = STEP_THREAD_WAIT;
+	return  -1;
+}
+DWORD TMainThread::CheckPSUReturnValue(DWORD ItemIndex,DWORD PSUIndex)
+{
+	//取出電壓電流值
+	AnsiString strTemp = mPowerSupplyAccess->GetValue();
+	AnsiString VoltageTemp,CurrentTemp;
+	if(INI_Desc->PSUName[PSUIndex].Pos("PSW"))
+	{
+		VoltageTemp = strTemp.SubString(2,strTemp.Pos(";")-2);
+		strTemp.Delete(1,strTemp.Pos(";"));
+		CurrentTemp = strTemp.SubString(2,strTemp.Pos("\n")-2);
+	}
+	else
+	{
+		VoltageTemp = strTemp.SubString(1,strTemp.Pos("\n")-1);
+		strTemp.Delete(1,strTemp.Pos("\n"));
+		CurrentTemp = strTemp.SubString(1,strTemp.Pos("\n")-1);
+	}
+	strTemp = "[PSU "+AnsiString(PSUIndex+1)+"] "+AnsiString(VoltageTemp)+"V "+AnsiString(CurrentTemp)+"A";
+	INI_Desc->queDetail.push(strTemp);
+	if(IsNumeric(VoltageTemp) && IsNumeric(CurrentTemp))
+	{
+		//放進queue
+		queThreadVoltageValue.push(VoltageTemp*1000);
+		queThreadCurrentValue.push(CurrentTemp*1000);
+		if(INI_Desc->PITEM_DESCRIPOR[ItemIndex].PPSU_DESCRIPOR[PSUIndex].dbCurrentMin
+			<= (CurrentTemp*1000)
+			&&INI_Desc->PITEM_DESCRIPOR[ItemIndex].PPSU_DESCRIPOR[PSUIndex].dbCurrentMax
+			>= (CurrentTemp*1000))
+			return GET_VALUE_CONTINUE;
+		else
+			return GET_VALUE_FAIL;
+	}
+	else
+		return GET_VALUE_ERROR;
+}
+bool TMainThread::IsNumeric(AnsiString input)
+{
+    bool hasDecimalPoint = false;
+
+    // 檢查是否為空字串
+    if (input.IsEmpty())
+        return false;
+
+    for (int i = 1; i <= input.Length(); i++) {
+        char c = input[i];
+
+        // 檢查是否為數字
+        if (c >= '0' && c <= '9') {
+            continue; // 數字字符，繼續檢查下一個字符
+        }
+        // 檢查是否為小數點
+        else if (c == '.' && !hasDecimalPoint) {
+            hasDecimalPoint = true;
+            continue; // 小數點，繼續檢查下一個字符
+        } else {
+            return false; // 非數字字符，不是數字
+        }
+    }
+
+    return true;
+}
+void TMainThread::EnumHID()
+{
+	HDEVINFO hDevInfo;
+	SP_DEVINFO_DATA DeviceInfoData;
+	DWORD i,j;
+	AnsiString SS,USBPath;
+	PSP_DEVICE_INTERFACE_DETAIL_DATA   pDetail   =NULL;
+	GUID GUID_USB_HID =StringToGUID("{4d1e55b2-f16f-11cf-88cb-001111000030}");
+	//DEBUG("[ HID裝置列舉 ]");
+	//ckbAuto->Checked = false;
+	//--------------------------------------------------------------------------
+	//   獲取設備資訊
+	hDevInfo = SetupDiGetClassDevs((LPGUID)&GUID_USB_HID,
+	0,   //   Enumerator
+	0,
+	DIGCF_PRESENT | DIGCF_DEVICEINTERFACE );
+	if   (hDevInfo   ==   INVALID_HANDLE_VALUE){
+		//DEBUG("ERROR - SetupDiGetClassDevs()"); //   查詢資訊失敗
+	}
+	else{
+	//--------------------------------------------------------------------------
+		SP_DEVICE_INTERFACE_DATA   ifdata;
+		DeviceInfoData.cbSize   =   sizeof(SP_DEVINFO_DATA);
+		for (i=0;SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInfoData);i++)	//   枚舉每個USB設備
+		{
+			ULONG   len;
+			CONFIGRET cr;
+			PNP_VETO_TYPE   pnpvietotype;
+			CHAR   vetoname[MAX_PATH];
+			ULONG   ulStatus;
+			ULONG   ulProblemNumber;
+			ifdata.cbSize   =   sizeof(ifdata);
+			if (SetupDiEnumDeviceInterfaces(								//   枚舉符合該GUID的設備介面
+			hDevInfo,           //   設備資訊集控制碼
+			NULL,                         //   不需額外的設備描述
+			(LPGUID)&GUID_USB_HID,//GUID_CLASS_USB_DEVICE,                     //   GUID
+			(ULONG)i,       //   設備資訊集裏的設備序號
+			&ifdata))                 //   設備介面資訊
+			{
+				ULONG predictedLength   =   0;
+				ULONG requiredLength   =   0;
+				//   取得該設備介面的細節(設備路徑)
+				SetupDiGetInterfaceDeviceDetail(hDevInfo,         //   設備資訊集控制碼
+					&ifdata,          //   設備介面資訊
+					NULL,             //   設備介面細節(設備路徑)
+					0,         	      //   輸出緩衝區大小
+					&requiredLength,  //   不需計算輸出緩衝區大小(直接用設定值)
+					NULL);            //   不需額外的設備描述
+				//   取得該設備介面的細節(設備路徑)
+				predictedLength=requiredLength;
+				pDetail = (PSP_INTERFACE_DEVICE_DETAIL_DATA)::GlobalAlloc(LMEM_ZEROINIT,   predictedLength);
+				pDetail->cbSize   =   sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+
+				if(SetupDiGetInterfaceDeviceDetail(hDevInfo,         //   設備資訊集控制碼
+					&ifdata,             //   設備介面資訊
+					pDetail,             //   設備介面細節(設備路徑)
+					predictedLength,     //   輸出緩衝區大小
+					&requiredLength,     //   不需計算輸出緩衝區大小(直接用設定值)
+					NULL))               //   不需額外的設備描述
+				{
+					try
+					{
+						char   ch[512];
+						for(j=0;j<predictedLength;j++)
+						{
+						ch[j]=*(pDetail->DevicePath+8+j);
+						}
+						SS=ch;
+						//DEBUG(SS);
+						if(strstr(SS.c_str(),AnsiString(PD_BOARD_PVID).SubString(5,AnsiString(PD_BOARD_PVID).Length()).c_str()))
+						{
+							//ckbAuto->Checked = true;
+						}
+					}
+					catch(...)
+					{
+						//DEBUG("列舉失敗");
+                    }
+				}
+				else
+				{
+					//DEBUG("SetupDiGetInterfaceDeviceDetail F");
+				}
+			}
+			else
+			{
+				//DEBUG("SetupDiEnumDeviceInterfaces F");
+			}
+		}
+	}
+	/*if(!ckbAuto->Checked)
+	{
+		pl_Msg->Visible = true;
+		pl_Msg->Font->Color = clRed;
+		pl_Msg->Caption = MSG_NOT_FIND_ZEBRA_BOARD;
+	}
+	else
+	{
+		pl_Msg->Visible = false;
+	}*/
+}
+void TMainThread::CaptureAndSaveScreenshot()
+{
+	HWND hwnd = FindWindowA(NULL, APP_TITLE); // 替換成你的UI窗口標題
+	if (hwnd) {
+        HDC hdcWindow = GetDC(hwnd);
+
+        // 獲取UI窗口的寬度和高度
+        RECT rcClient;
+        GetClientRect(hwnd, &rcClient);
+        int width = rcClient.right - rcClient.left;
+        int height = rcClient.bottom - rcClient.top;
+
+        // 創建一個Bitmap並將畫面繪製到它上面
+        Graphics::TBitmap *bitmap = new Graphics::TBitmap;
+        bitmap->Width = width;
+        bitmap->Height = height;
+        BitBlt(bitmap->Canvas->Handle, 0, 0, width, height, hdcWindow, 0, 0, SRCCOPY);
+
+        // 保存圖像到檔案
+        bitmap->SaveToFile("C:\\screenshot.bmp"); // 替換成你的保存路徑
+
+        delete bitmap;
+        ReleaseDC(hwnd, hdcWindow);
+	}
+}
+AnsiString TMainThread::GetAllPSUName()
+{
+    return mPowerSupplyAccess->FindAllPowerSupplyName();
+}
+void TMainThread::SetPSUCOM()
+{
+	mPowerSupplyAccess->SetDeviceCOM();
+}
+bool TMainThread::CheckPUSStatus()
+{
+	for(DWORD i = 0 ; i < INI_Desc->PITEM_DESCRIPOR[INI_Desc->dwNowTestItemIndex].dwPSUCount ; i++)
+	{
+		mPowerSupplyAccess->SetDeviceIndex(0,i);
+		if(!mPowerSupplyAccess->CheckPSUIsOnline())
+			return true;
+		Sleep(500);//指令間距
+	}
+	return false;
+}

@@ -1,0 +1,148 @@
+object frmMsg: TfrmMsg
+  Left = 0
+  Top = 0
+  BorderIcons = [biMinimize, biMaximize]
+  ClientHeight = 188
+  ClientWidth = 733
+  Color = clHighlightText
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object plKeyboard: TPanel
+    Left = 0
+    Top = 0
+    Width = 733
+    Height = 91
+    Align = alTop
+    TabOrder = 0
+    object plHotKeyTitle: TPanel
+      Left = 1
+      Top = 1
+      Width = 731
+      Height = 48
+      Align = alTop
+      Caption = #35531#37749#30436#36664#20837' : Scroll Lock + Scroll Lock + S'
+      Color = clSkyBlue
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -27
+      Font.Name = #27161#26999#39636
+      Font.Style = []
+      ParentBackground = False
+      ParentFont = False
+      TabOrder = 0
+    end
+    object edtHotKey: TEdit
+      Left = 1
+      Top = 49
+      Width = 595
+      Height = 41
+      Align = alClient
+      Alignment = taCenter
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlue
+      Font.Height = -27
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      OnChange = edtHotKeyChange
+      OnKeyUp = edtHotKeyKeyUp
+      ExplicitHeight = 39
+    end
+    object btnNext: TBitBtn
+      Left = 596
+      Top = 49
+      Width = 136
+      Height = 41
+      Align = alRight
+      Caption = 'Next'
+      DoubleBuffered = True
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -33
+      Font.Name = 'Times New Roman'
+      Font.Style = []
+      ParentDoubleBuffered = False
+      ParentFont = False
+      TabOrder = 2
+      OnClick = btnNextClick
+    end
+  end
+  object plScreen: TPanel
+    Left = 0
+    Top = 91
+    Width = 733
+    Height = 97
+    Align = alTop
+    TabOrder = 1
+    object Panel4: TPanel
+      Left = 1
+      Top = 49
+      Width = 731
+      Height = 47
+      Align = alClient
+      TabOrder = 0
+      object btnScreenFail: TBitBtn
+        Left = 369
+        Top = 1
+        Width = 362
+        Height = 45
+        Align = alLeft
+        Caption = #30064#24120
+        DoubleBuffered = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -27
+        Font.Name = #27161#26999#39636
+        Font.Style = []
+        ParentDoubleBuffered = False
+        ParentFont = False
+        TabOrder = 0
+        OnClick = btnScreenOKClick
+      end
+      object btnScreenOK: TBitBtn
+        Left = 1
+        Top = 1
+        Width = 368
+        Height = 45
+        Align = alLeft
+        Caption = #27491#24120
+        DoubleBuffered = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -27
+        Font.Name = #27161#26999#39636
+        Font.Style = []
+        ParentDoubleBuffered = False
+        ParentFont = False
+        TabOrder = 1
+        OnClick = btnScreenOKClick
+      end
+    end
+    object plScreenTitle: TPanel
+      Left = 1
+      Top = 1
+      Width = 731
+      Height = 48
+      Align = alTop
+      Caption = #30059#38754#26159#21542#27491#24120
+      Color = clSkyBlue
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -27
+      Font.Name = #27161#26999#39636
+      Font.Style = []
+      ParentBackground = False
+      ParentFont = False
+      TabOrder = 1
+    end
+  end
+end

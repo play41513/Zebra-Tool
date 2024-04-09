@@ -1,0 +1,169 @@
+//---------------------------------------------------------------------------
+
+
+#pragma hdrstop
+
+#include "PowerSupplyAccess.h"
+
+//---------------------------------------------------------------------------
+
+#pragma package(smart_init)
+
+PowerSupplyAccess::PowerSupplyAccess(INI_DESCRIPOR *ini)
+{
+	INI_Desc = ini;
+	dwPSUIndex = 0;
+	dwItemIndex   = 0;
+	mSerialPortControl = new SerialPortControl();
+}
+void PowerSupplyAccess::SetDeviceIndex(DWORD ItemIndex,DWORD PSUIndex)
+{
+	dwItemIndex = ItemIndex;
+	dwPSUIndex = PSUIndex;
+	mSerialPortControl->CommPort_Set_Device_Index(PSUIndex);
+	mSerialPortControl->CommPort_Set_Device_Name(PSUIndex,INI_Desc->PSUName[PSUIndex]);
+}
+bool PowerSupplyAccess::CheckPSUIsOnline()
+{
+	return mSerialPortControl->CommPort_OpenCommPort();
+	/*if(mSerialPortControl->CommPort_SendMsg("*idn?\n"))
+	{
+		AnsiString sTemp = mSerialPortControl->CommPort_ReadMsg();
+		return sTemp.Pos(INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].Name);
+	}
+	else
+		return false;*/
+}
+bool PowerSupplyAccess::ClosePower()
+{
+	if(mSerialPortControl->CommPort_SendMsg(":OUTPut:STATe 0\n"))
+		if(mSerialPortControl->CommPort_SendMsg("OUTPut:PROTection:CLEar\n"))
+			if(mSerialPortControl->CommPort_SendMsg("CHAN1:PROTection:CURRent 0\n"))
+				return true;
+	return false;
+}
+void PowerSupplyAccess::ClosePowerSupply()
+{
+	ClosePower();
+	mSerialPortControl->CommPort_Stop();
+	mSerialPortControl->CommPort_SerSerialPort("");
+}
+bool PowerSupplyAccess::SetParameter()
+{
+	if(INI_Desc->PSUName[dwPSUIndex].Pos("PSW"))
+	{
+		if(mSerialPortControl->CommPort_OpenCommPort())
+		{
+			AnsiString strCMD;
+				strCMD.sprintf("SOUR:VOLT:PROT:LEV +%.3f\n"
+					,(INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbVoltage/1000)+1);
+			mSerialPortControl->CommPort_SendMsg("SOUR:VOLT:PROT:LEV +13\n");
+			strCMD.sprintf("SOUR:CURR:PROT:LEV +%.3f\n"
+				,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbSurgeCurrent/1000);
+			mSerialPortControl->CommPort_SendMsg(strCMD);
+			mSerialPortControl->CommPort_SendMsg("SOUR:VOLT:PROT:STAT ON\n");
+			mSerialPortControl->CommPort_SendMsg("SOUR:CURR:PROT:STAT ON\n");
+			mSerialPortControl->CommPort_SendMsg("DISP:MENU:NAME 0\n");
+			/*
+			[CVHS] CV High-Speed Priority（CV 高速優先）：
+			在這種模式下，電源供應器的主要優先目標是盡快維持設定的恆定電壓。
+			當負載發生變化時，電源供應器將儘量迅速調整輸出電壓，以維持設定的電壓水平。
+			這種模式適用於需要快速穩定的應用，通常用於實驗室測試和測量，以確保快速的電壓響應。
+
+			[CVLS] CV Slew Rate Priority（CV 斜率率優先）：
+			在這種模式下，電源供應器的主要優先目標是平滑地調整輸出電壓，以防止急劇的變化。
+			當負載發生變化時，電源供應器會緩慢調整輸出電壓，以減緩變化的速度，以確保穩定性。
+			*/
+			strCMD = "OUTPut:MODE CVLS\n";
+			if(mSerialPortControl->CommPort_SendMsg(strCMD))
+			{
+				strCMD.sprintf("APPL %.3f,%.3f\n"
+					,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbVoltage/1000
+					,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbSurgeCurrent/1000);
+				if(mSerialPortControl->CommPort_SendMsg(strCMD))
+				{
+					if(OpenPower())
+					{
+						if(INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbSurgeCurrent
+						 != INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbCurrent)
+						 {
+							bool bPass;
+							strCMD.sprintf("SOUR:CURR:PROT:LEV +%.3f\n"
+								,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbCurrent/1000);
+							if(mSerialPortControl->CommPort_SendMsg(strCMD))
+							{
+								strCMD.sprintf("APPL %.3f,%.3f\n"
+									,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbVoltage/1000
+									,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbCurrent/1000);
+								if(mSerialPortControl->CommPort_SendMsg(strCMD))
+									return true;
+							}
+						 }
+						else
+							return true;
+					}
+				}
+			}
+		}
+		mSerialPortControl->CommPort_Stop();
+		return false;
+	}
+	else// if(INI_Desc->PSUName[dwPSUIndex].Pos("PSS"))
+	{
+		if(mSerialPortControl->CommPort_OpenCommPort())
+		{
+			AnsiString strCMD;
+			mSerialPortControl->CommPort_SendMsg("CHAN1:PROTection:CURRent 1\n");
+			strCMD.sprintf("CHAN1:VOLTage %.4f\n"
+				,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbVoltage/1000);
+			if(mSerialPortControl->CommPort_SendMsg(strCMD))
+			{
+				strCMD.sprintf("CHAN1:CURRent %.4f\n"
+					,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbSurgeCurrent/1000);
+				if(mSerialPortControl->CommPort_SendMsg(strCMD))
+				{
+					if(OpenPower())
+					{
+						if(INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbSurgeCurrent
+						 != INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbCurrent)
+						{
+							strCMD.sprintf("CHAN1:CURRent %.4f\n"
+								,INI_Desc->PITEM_DESCRIPOR[dwItemIndex].PPSU_DESCRIPOR[dwPSUIndex].dbCurrent/1000);
+							if(mSerialPortControl->CommPort_SendMsg(strCMD))
+								return true;
+						}
+						else
+							return true;
+					}
+                }
+			}
+		}
+		mSerialPortControl->CommPort_Stop();
+		return false;
+	}
+	return false;
+}
+bool PowerSupplyAccess::OpenPower()
+{
+	return mSerialPortControl->CommPort_SendMsg(":OUTPut:STATe 1\n");
+}
+AnsiString PowerSupplyAccess::GetValue()
+{
+	if(mSerialPortControl->CommPort_SendMsg("CHAN1:MEASure:VOLTage?;CURRent?\n"))
+	{
+		return mSerialPortControl->CommPort_ReadMsg();
+	}
+	mSerialPortControl->CommPort_Stop();
+	return "";
+}
+bool PowerSupplyAccess::ReturnPowerSupplyStatus()
+{
+	mSerialPortControl->CommPort_SendMsg(":OUTPut:STATe?\n");
+	AnsiString sTemp = mSerialPortControl->CommPort_ReadMsg();
+	return sTemp.Pos("1");
+}
+AnsiString PowerSupplyAccess::FindAllPowerSupplyName()
+{
+	return mSerialPortControl->CommPort_SearchAllDevCOM();
+}
+

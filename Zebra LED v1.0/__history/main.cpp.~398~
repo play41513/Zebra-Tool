@@ -1,0 +1,314 @@
+﻿//---------------------------------------------------------------------------
+#include <windows.h>    // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <SetupAPI.h> // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <cfgmgr32.h> // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <vcl.h>
+#pragma hdrstop
+
+#include "main.h"
+#include <string>
+#include "MessageBox.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma link "Gauges"
+#pragma link "cspin"
+#pragma resource "*.dfm"
+TFrmMain *FrmMain;
+//---------------------------------------------------------------------------
+__fastcall TFrmMain::TFrmMain(TComponent* Owner)
+	: TForm(Owner)
+{
+	FrmMain->Caption = APP_TITLE;
+
+	mFileControlBase = new cFileControl(&INI_Desc);
+	mFileControlBase->FindINIFile();
+	labProduct->Caption = INI_Desc.ININame;
+	labIni->Caption = INI_Desc.JigNumber;
+	plSwitchLable->Caption = INI_Desc.PITEM_SWITCH_SETTING.Message;
+
+	mainThread = new TMainThread(true,&INI_Desc,FrmMain->Handle);
+	if(INI_Desc.PITEM_DESCRIPOR[0].dwPSUCount > 1)
+	{
+		strListCOM = new TStringList();
+		strListName = new TStringList();
+		UpdatePSUDevice();
+		if(cbboxPSU1->Items->Count >=2 )
+		{
+			if(cbboxPSU1->Text == "" || cbboxPSU2->Text == "")
+				plPSUPage->Visible = true;
+			else
+				btnPSUNameOkClick(NULL);
+			btnPSUNameOk->Enabled = true;
+		}
+		else
+		{
+			btnPSUNameOk->Enabled = false;
+			plPSUPage->Visible = true;
+		}
+	}
+	else
+		mainThread->Resume();
+
+	OldFormWndProc = this->WindowProc;
+	this->WindowProc = FormWndProc;
+
+	ReadItemParm(0);
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::FormWndProc(TMessage& Message)
+{
+	switch(Message.Msg)
+	{
+		case WM_UI_RESULT:
+			switch(Message.WParam)
+			{
+				case WP_UI_RESULT_PASS:
+					plResult->Color = clGreen;
+					plStaus->Caption = "測試結束";
+					plResult->Caption = "PASS";
+					break;
+				case WP_UI_RESULT_FAIL:
+					plResult->Color = clRed;
+					plStaus->Caption = "測試結束";
+					plResult->Caption = "FAIL";
+					break;
+				case WP_UI_RESULT_INIT:
+					plResult->Color = clWhite;
+					plResult->Caption = "Wait...";
+					break;
+				case WP_UI_RESULT_TEST:
+					plResult->Color = clWhite;
+					plStaus->Caption = "測試中";
+					plResult->Caption = "Testing...";
+					for(int i = 0 ; i < 15 ; i++)
+						((TPanel*)FrmMain->FindComponent("plADValue"+AnsiString(i)))->Caption = "";
+					break;
+				case WP_UI_NO_HID_BOARD:
+					plErrorMsg->Visible = true;
+					plErrorMsg->Font->Color = clRed;
+					plErrorMsg->Caption = MSG_NOT_FIND_ZEBRA_BOARD;
+					break;
+				case WP_UI_ERRORMSG_INVISIBLE:
+					plErrorMsg->Visible = false;
+					FrmMain->Refresh();
+					break;
+				case WP_UI_NO_PSU:
+					plErrorMsg->Visible = true;
+					plErrorMsg->Font->Color = clRed;
+					plErrorMsg->Caption = MSG_PSU_NO_RESPOND;
+					break;
+				case WP_UI_REFRESH_AD_ITEM:
+					ReadItemParm(INI_Desc.dwNowTestItemIndex);
+					break;
+				case WP_UI_SWITCH_FORM_VISABLE:
+					plSwitchSetting->Visible = Message.LParam ? true:false;
+					if(plSwitchSetting->Visible)
+					{
+						plSwitchSetting->Left = (FrmMain->Width/2)-(plSwitchSetting->Width/2);
+						plSwitchSetting->Top  = (FrmMain->Height/2)-(plSwitchSetting->Height/2);
+                    }
+					break;
+			}
+			FrmMain->Refresh();
+			break;
+		case WM_AD_VALUE_UI:
+			switch(Message.WParam)
+			{
+				case WP_AD_VALUE_UI_PASS:
+					((TEdit*)FrmMain->FindComponent("plADValue"+AnsiString(Message.LParam)))->Text
+						= INI_Desc.PITEM_DESCRIPOR[INI_Desc.dwNowTestItemIndex].PITEM_AD_DESCRIPOR[Message.LParam].dbVoltageValue;
+					((TEdit*)FrmMain->FindComponent("plADValue"+AnsiString(Message.LParam)))->Font->Color = clGreen;
+					break;
+				case WP_AD_VALUE_UI_FAIL:
+					((TEdit*)FrmMain->FindComponent("plADValue"+AnsiString(Message.LParam)))->Text
+						= INI_Desc.PITEM_DESCRIPOR[INI_Desc.dwNowTestItemIndex].PITEM_AD_DESCRIPOR[Message.LParam].dbVoltageValue;
+						((TEdit*)FrmMain->FindComponent("plADValue"+AnsiString(Message.LParam)))->Font->Color = clRed;
+					break;
+				case WP_AD_VALUE_UI_TEST:
+					((TEdit*)FrmMain->FindComponent("plADValue"+AnsiString(Message.LParam)))->Text
+						= "Testing";
+						((TEdit*)FrmMain->FindComponent("plADValue"+AnsiString(Message.LParam)))->Font->Color = clBlue;
+					break;
+				case WP_AD_VALUE_UI_CLEAR:
+					((TEdit*)FrmMain->FindComponent("plADValue"+AnsiString(Message.LParam)))->Text
+						= "";
+					break;
+            }
+			break;
+    }
+	TForm :: WndProc(Message);
+}
+void TFrmMain::ReadItemParm(int Index)
+{
+	for(int i = 0 ; i < 15 ; i++)
+	{
+		((TPanel*)FrmMain->FindComponent("pl_Auto"+AnsiString(i)))->Caption
+			= INI_Desc.PITEM_DESCRIPOR[Index].PITEM_AD_DESCRIPOR[i].bTest ? "V":"";
+		((TPanel*)FrmMain->FindComponent("pl_pin"+AnsiString(i)))->Caption
+			= INI_Desc.PITEM_DESCRIPOR[Index].PITEM_AD_DESCRIPOR[i].Name;
+		((TEdit*)FrmMain->FindComponent("edtADSetMin"+AnsiString(i)))->Text
+			= INI_Desc.PITEM_DESCRIPOR[Index].PITEM_AD_DESCRIPOR[i].dbVoltageMin;
+		((TEdit*)FrmMain->FindComponent("edtADSetMax"+AnsiString(i)))->Text
+			= INI_Desc.PITEM_DESCRIPOR[Index].PITEM_AD_DESCRIPOR[i].dbVoltageMax;
+	}
+	for(int i = 0 ; i < INI_Desc.PITEM_DESCRIPOR[Index].dwPSUCount ; i++)
+	{
+		((TEdit*)FrmMain->FindComponent("edtPSUVol"+AnsiString(i+1)))->Text
+			= INI_Desc.PITEM_DESCRIPOR[Index].PPSU_DESCRIPOR[i].dbVoltage/1000;
+		((TEdit*)FrmMain->FindComponent("edtPSUSurgeCur"+AnsiString(i+1)))->Text
+			= INI_Desc.PITEM_DESCRIPOR[Index].PPSU_DESCRIPOR[i].dbSurgeCurrent/1000;
+		((TEdit*)FrmMain->FindComponent("edtPSUCur"+AnsiString(i+1)))->Text
+			= INI_Desc.PITEM_DESCRIPOR[Index].PPSU_DESCRIPOR[i].dbCurrent/1000;
+		((TEdit*)FrmMain->FindComponent("edtPSUCurMin"+AnsiString(i+1)))->Text
+			= INI_Desc.PITEM_DESCRIPOR[Index].PPSU_DESCRIPOR[i].dbCurrentMin/1000;
+		((TEdit*)FrmMain->FindComponent("edtPSUCurMax"+AnsiString(i+1)))->Text
+			= INI_Desc.PITEM_DESCRIPOR[Index].PPSU_DESCRIPOR[i].dbCurrentMax/1000;
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::plAD0Click(TObject *Sender)
+{
+	plSet->Enabled = false;
+	TPanel* plAD = (TPanel*)Sender;
+	AnsiString ss = plAD->Name;
+	int NumIndex = (ss.Delete(1,4)).ToInt();
+	INI_Desc.queDetail.push("Get AD "+AnsiString(NumIndex)+" ...");
+	((TPanel*)FrmMain->FindComponent("plADValue"+AnsiString(NumIndex)))->Caption = mainThread->GetADValue(NumIndex);
+	INI_Desc.queDetail.push(((TPanel*)FrmMain->FindComponent("plADValue"+AnsiString(NumIndex)))->Caption);
+	FrmMain->Refresh();
+	plSet->Enabled = true;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::TimerDetailTimer(TObject *Sender)
+{
+	TimerDetail->Enabled = false;
+	if(!INI_Desc.queDetail.empty())
+	{
+		lboxDetail->Items->Add(INI_Desc.queDetail.front());
+		lboxDetail->ItemIndex = lboxDetail->Items->Count - 1;
+
+		INI_Desc.queDetail.pop();
+	}
+	TimerDetail->Enabled = true;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::pl_Set_SwitchClick(TObject *Sender)
+{
+	FrmMain->AutoSize =false;
+	if(pl_Right->Width)
+	{
+	   pl_Right->Width = 0;
+	   pl_Set_Switch ->Caption =">";
+	   FrmMain->Width -=514;
+	   FrmMain->Height = 370;
+	}
+	else
+	{
+	   pl_Right->Width = 514;
+	   pl_Set_Switch ->Caption ="<";
+	   FrmMain->Width +=514;
+	   FrmMain->Height = 756;
+	}
+	FrmMain->AutoSize =true;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::btnSwitchFailClick(TObject *Sender)
+{
+	mainThread->bSwitchFail = true;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::btnGetPSUNameClick(TObject *Sender)
+{
+	UpdatePSUDevice();
+	if(cbboxPSU1->Items->Count >=2 )
+	{
+		if(cbboxPSU1->Text == "" || cbboxPSU2->Text == "")
+			btnPSUNameOk->Enabled = false;
+		else
+			btnPSUNameOk->Enabled = true;
+	}
+	else
+	{
+		btnPSUNameOk->Enabled = false;
+	}
+}
+void TFrmMain::UpdatePSUDevice()
+{
+	AnsiString strTemp = mainThread->GetAllPSUName();
+	cbboxPSU1->Clear();
+	cbboxPSU2->Clear();
+	strListCOM->Clear();
+	strListName->Clear();
+	plPSUName1->Caption="";
+	plPSUName2->Caption="";
+	while(true)
+	{
+		if(strTemp.Length()== 0)
+			break;
+		strListCOM->Add(strTemp.SubString(1,strTemp.Pos("-")-1));
+		strTemp.Delete(1,strTemp.Pos("-"));
+		strListName->Add(strTemp.SubString(1,strTemp.Pos("\n")));
+		strTemp.Delete(1,strTemp.Pos("\n"));
+	}
+
+	cbboxPSU1->Items->Text = strListCOM->Text;
+	cbboxPSU2->Items->Text = strListCOM->Text;
+
+	if(INI_Desc.PSUCOMNum[0] == "" || INI_Desc.PSUCOMNum[1] == "")
+	{
+		cbboxPSU1->ItemIndex = 0;
+		plPSUName1->Caption = strListName->Strings[0];
+		cbboxPSU2->ItemIndex = 0;
+		plPSUName2->Caption = strListName->Strings[0];
+	}
+	else
+	{
+		for(int i = 0 ; i < cbboxPSU1->Items->Count ; i++)
+		{
+			if(cbboxPSU1->Items->Strings[i] == INI_Desc.PSUCOMNum[0])
+			{
+				cbboxPSU1->ItemIndex = i;
+				cbboxPSU1Change(cbboxPSU1);
+			}
+		}
+		for(int i = 0 ; i < cbboxPSU2->Items->Count ; i++)
+		{
+			if(cbboxPSU2->Items->Strings[i] == INI_Desc.PSUCOMNum[1])
+			{
+				cbboxPSU2->ItemIndex = i;
+				cbboxPSU1Change(cbboxPSU2);
+			}
+		}
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::btnPSUNameOkClick(TObject *Sender)
+{
+	if(cbboxPSU1->Text == "" || cbboxPSU2->Text == "")
+		MessageBoxA(FrmMain->Handle, "有空白的裝置名稱", "", MB_ICONWARNING);
+	else if(cbboxPSU1->Text == cbboxPSU2->Text)
+		MessageBoxA(FrmMain->Handle, "名稱重複", "", MB_ICONWARNING);
+	else
+	{
+		mFileControlBase->WritePSUCOMToFile(1,cbboxPSU1->Text);
+		mFileControlBase->WritePSUCOMToFile(2,cbboxPSU2->Text);
+		mFileControlBase->FindINIFile();
+		INI_Desc.PSUName[0] = plPSUName1->Caption;
+		INI_Desc.PSUName[1] = plPSUName2->Caption;
+        mainThread->SetPSUCOM();
+		plPSUPage->Visible = false;
+		mainThread->Resume();
+    }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::cbboxPSU1Change(TObject *Sender)
+{
+	TComboBox* cb = (TComboBox*) Sender;
+	((TPanel*)FrmMain->FindComponent("plPSUName"+AnsiString(cb->Tag)))->Caption
+		= strListName->Strings[cb->ItemIndex];
+}
+//---------------------------------------------------------------------------
+

@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/09/28 14:38:58.603.cpp,D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\LogMsg.cpp=D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\LogMsgBase.cpp</Transaction>
+    <Transaction>2023/09/28 14:38:58.603.h,D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\LogMsg.h=D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\LogMsgBase.h</Transaction>
+    <Transaction>2023/09/28 14:41:39.302.cpp,D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\FileControlBase.cpp=</Transaction>
+    <Transaction>2023/09/28 14:42:05.554.cpp,D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\FileControl.cpp=D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\FileControlBase.cpp</Transaction>
+    <Transaction>2023/09/28 14:42:05.554.h,D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\FileControl.h=D:\SourceCode\BCB\Zebra\Zebra LED v1.0\Base\FileControlBase.h</Transaction>
+    <Transaction>2023/09/28 14:44:58.274.cpp,D:\SourceCode\BCB\Zebra\Zebra LED v1.0\HID\HID.cpp=</Transaction>
+    <Transaction>2023/10/02 10:22:23.909.cpp,D:\SourceCode\BCB\Zebra\Zebra LED v1.0\PSU_control.cpp=</Transaction>
+  </Transactions>
+	<ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="Base"/>
+    <File Path="Base\FileControlBase.cpp"/>
+    <File Path="Base\FileControlBase.cpp"/>
+    <File Path="Base\FileControlBase.h"/>
+    <File Path="Base\LogMsgBase.cpp"/>
+    <File Path="Base\LogMsgBase.cpp"/>
+    <File Path="Base\LogMsgBase.h"/>
+    <File Path="Base\SerialPortControlBase.cpp"/>
+    <File Path="Base\SerialPortControlBase.cpp"/>
+    <File Path="Base\SerialPortControlBase.h"/>
+    <File Path="DataAccess"/>
+    <File Path="DataAccess\PowerSupplyAccess.cpp"/>
+    <File Path="DataAccess\PowerSupplyAccess.cpp"/>
+    <File Path="DataAccess\PowerSupplyAccess.h"/>
+    <File Path="HID"/>
+    <File Path="HID\WinDDK7600.16385.1"/>
+    <File Path="HID\WinDDK7600.16385.1\inc"/>
+    <File Path="HID\WinDDK7600.16385.1\inc\api"/>
+    <File Path="HID\WinDDK7600.16385.1\inc\api\hidsdi.h"/>
+    <File Path="HID\HID.cpp"/>
+    <File Path="HID\HID.cpp"/>
+    <File Path="HID\HID.h"/>
+    <File Path="123.rc"/>
+    <File Path="HID\WinDDK7600.16385.1\lib\win7\i386\7omf_hid.lib"/>
+    <File Path="ConstantString.h"/>
+    <File Path="DeviceNotify.h"/>
+    <File Path="IO_Request.h"/>
+    <File Path="main.cpp"/>
+    <File Path="main.cpp"/>
+    <File Path="main.dfm"/>
+    <File Path="main.h"/>
+    <File Path="MainThread.cpp"/>
+    <File Path="MainThread.cpp"/>
+    <File Path="MainThread.h"/>
+    <File Path="MessageBox.cpp"/>
+    <File Path="MessageBox.cpp"/>
+    <File Path="MessageBox.dfm"/>
+    <File Path="MessageBox.h"/>
+    <File Path="MessageBox.dfm"/>
+    <File Path="Zebra.cpp"/>
+    <File Path="Zebra.res"/>
+  </ProjectSortOrder>
+</BorlandProject>

@@ -1,0 +1,33 @@
+//---------------------------------------------------------------------------
+
+#ifndef PSU_controlH
+#define PSU_controlH
+
+
+#define TEST_END			0
+#define RS232_WRITE			1
+#define RS232_READ			2
+
+//---------------------------------------------------------------------------
+struct tag_cmd_desc {
+	char *cmd;
+	int (*pfn)(char *s);
+	};
+	typedef struct tag_cmd_desc CMD_DESC;
+class cPSU{
+	private:
+
+
+	public:
+
+
+		bool 	open_psu_com();
+		void	PSU_CMD_Test();
+		void 	search_Reg_ComNum();
+		void 	SearchPSUCOM();
+
+		void 	QueueClear();
+		void 	PSU_Stop();
+
+};
+#endif

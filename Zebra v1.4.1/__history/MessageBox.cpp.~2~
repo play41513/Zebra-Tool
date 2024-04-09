@@ -1,0 +1,27 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "MessageBox.h"
+#include "main.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TfrmMsg *frmMsg;
+//---------------------------------------------------------------------------
+__fastcall TfrmMsg::TfrmMsg(TComponent* Owner)
+	: TForm(Owner)
+{
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMsg::btnScreenOKClick(TObject *Sender)
+{
+	TBitBtn *btn = (TBitBtn*)Sender;
+	ModalResult = btn->Name.Pos("OK")?mrOk:mrCancel;
+}
+//---------------------------------------------------------------------------
+
+
+
+

@@ -1,0 +1,29 @@
+//---------------------------------------------------------------------------
+
+#ifndef FileControlBaseH
+#define FileControlBaseH
+#include <fstream.h>
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <direct.h>
+#include <IniFiles.hpp>
+#include "ConstantString.h"
+//---------------------------------------------------------------------------
+
+class cFileControl
+{
+	private:
+		AnsiString strSettingINI;
+		void ReadErrorCodeFile();
+		void ReadCMDFile();
+		INI_DESCRIPOR *INI_Desc;
+
+	public:
+		cFileControl::cFileControl(INI_DESCRIPOR *ini);
+		bool FindINIFile();
+		void ReadINIFile();
+		void 		  WriteINIFile(INI_DESCRIPOR info);
+
+};
+#endif

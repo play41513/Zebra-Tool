@@ -1,0 +1,36 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{1EF31060-2095-41FC-A7CB-B94AF94EFC37}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="Zebra.cbproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="Zebra">
+			<MSBuild Projects="Zebra.cbproj"/>
+		</Target>
+		<Target Name="Zebra:Clean">
+			<MSBuild Targets="Clean" Projects="Zebra.cbproj"/>
+		</Target>
+		<Target Name="Zebra:Make">
+			<MSBuild Targets="Make" Projects="Zebra.cbproj"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="Zebra"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="Zebra:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="Zebra:Make"/>
+		</Target>
+		<Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+	</Project>

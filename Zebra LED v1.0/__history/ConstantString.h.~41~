@@ -1,0 +1,180 @@
+﻿#ifndef ConstantStringH
+#define ConstantStringH
+//---------------------------------------------------------------------------
+#include <queue>
+//標題
+#define APP_TITLE "PD Voltage Test Tool  ver 3.2 ( ActionStar.)"
+//Thread
+#define STEP_THREAD_WAIT						0
+#define STEP_THREAD_START						1
+#define STEP_THREAD_SET_CMD						2
+#define STEP_THREAD_TEST_START					3
+#define STEP_THREAD_GET_VALUE					4
+#define STEP_THREAD_OPEN_POWER					5
+#define STEP_THREAD_WAIT_INIT_CURRENT			6
+#define STEP_THREAD_WAIT_INIT_TO_START_CURRENT	7
+#define STEP_THREAD_WAIT_START_CURRENT			8
+#define STEP_THREAD_WAIT_START_TO_END_CURRENT	9
+#define STEP_THREAD_WAIT_END_CURRENT			10
+#define STEP_THREAD_OPEN_TO_INIT_VOLTAGE		11
+#define STEP_THREAD_FAIL				99
+#define STEP_THREAD_PASS				100
+#define STEP_THREAD_TIMEOUT				101
+#define STEP_THREAD_ASK_PSU_STATUS		102
+#define STEP_THREAD_STOP				103
+
+#define STEP_GROUP_THREAD_WAIT					1
+#define STEP_GROUP_THREAD_CONTINUE				2
+#define STEP_GROUP_THREAD_TEST					3
+#define STEP_GROUP_THREAD_WAIT_RESULT			4
+#define STEP_GROUP_THREAD_PASS					5
+#define STEP_GROUP_THREAD_FAIL					6
+
+#define STEP_CMD_GET_USB_DEVICE				1
+#define STEP_CMD							2
+#define STEP_CMD_CHECK_REPORT_METHOD		3
+#define STEP_CMD_CHECK_REPORT_FILE			4
+#define STEP_CMD_CHECK_REPORT_LINE			5
+#define STEP_CMD_PASS						6
+#define STEP_CMD_FAIL						7
+#define STEP_CMD_WAIT_DEV_OUTPUT			8
+#define STEP_CMD_START_DELAY 				9
+#define STEP_REPEAT_CMD						10
+
+
+#define WM_UI_RESULT		WM_USER+100
+#define WP_UI_RESULT_PASS   WM_UI_RESULT+1
+#define WP_UI_RESULT_FAIL   WM_UI_RESULT+2
+#define WP_UI_RESULT_INIT   WM_UI_RESULT+3
+#define WP_UI_RESULT_TEST	WM_UI_RESULT+4
+#define WP_UI_NO_HID_BOARD  WM_UI_RESULT+5
+#define WP_UI_ERRORMSG_INVISIBLE 	WM_UI_RESULT+6
+#define WP_UI_NO_PSU  		WM_UI_RESULT+7
+#define WP_UI_REFRESH_AD_ITEM		WM_UI_RESULT+8
+#define WP_UI_SWITCH_FORM_VISABLE	WM_UI_RESULT+9
+
+
+#define WM_AD_VALUE_UI 			 WM_USER+200
+#define WP_AD_VALUE_UI_PASS	     WM_AD_VALUE_UI+1
+#define WP_AD_VALUE_UI_FAIL	 	 WM_AD_VALUE_UI+2
+#define WP_AD_VALUE_UI_TEST	     WM_AD_VALUE_UI+3
+#define WP_AD_VALUE_UI_CLEAR	 WM_AD_VALUE_UI+4
+
+#define WM_CMD_REPOET 			 WM_USER+300
+#define WP_CMD_REPOET_LINE		 WM_CMD_REPOET+1
+#define WP_CMD_REPOET_CLEAR		 WM_CMD_REPOET+2
+
+#define WM_CMD 			 	 WM_USER+400
+#define WP_CMD_LINE		 	 WM_CMD+1
+#define WP_CMD_CLEAR 		 WM_CMD+2
+
+#define WM_UI_ENABLE        WM_USER+500
+
+#define HOME_PAGE_INDEX		12
+#define PSU_IS_POWER_ON		13
+#define PSU_IS_POWER_OFF    14
+//Debug
+#define ERROR_PSU_RESPONDED_ABNORMALLY				1   //電供無回應
+#define ERROR_OPEN_TO_INIT_VOLTAGE_TIMEOUT			2   //開電後電壓在時間內沒到定值
+#define ERROR_WAIT_INIT_CURRENT_TIMEOUT				3   //電流在時間內沒到初始電流值
+#define ERROR_WAIT_INIT_TO_START_CURRENT_TIMEOUT	4   //電流在時間內沒到目標電流值
+#define ERROR_START_CURRENT_ABNORMALLY				5	//目標電流值異常
+#define ERROR_START_CURRENT_DURATION				6	//目標電流沒有持續目標時間以上
+#define ERROR_START_TO_END_CURRENT_TIMEOUT			7	//電流在時間內沒到結束電流值
+
+#define ERROR_INIT_CURRENT_ABNORMALLY				8	//初始電流值異常
+#define ERROR_INIT_VOLTAGE_ABNORMALLY				9	//初始電壓值異常
+#define ERROR_WAIT_INIT_TO_START_CURRENT_ABNORMALLY	10  //初始電流到目標電流時電流異常
+#define ERROR_WAIT_INIT_TO_START_VOLTAGE_ABNORMALLY	11  //初始電流到目標電流時電壓異常
+#define ERROR_START_VOLTAGE_ABNORMALLY				12	//目標電壓值異常
+#define ERROR_END_CURRENT_ABNORMALLY				13	//結束電流值異常
+#define ERROR_END_VOLTAGE_ABNORMALLY				14	//結束電壓值異常
+#define ERROR_FW_VERSION_1_ERROR					15	//韌體版本1錯誤
+#define ERROR_FW_VERSION_2_ERROR					16	//韌體版本2錯誤
+
+// ERROR MSG
+const AnsiString MSG_VOLTAGE_FAIL 				= "電壓異常 Voltage Error";
+const AnsiString MSG_CURRENT_FAIL 				= "電流異常 Current Error";
+const AnsiString MSG_OVP_CURRENT_FAIL 			= "[OVP]電流異常 [OVP]Current Error";
+const AnsiString MSG_DUT_OCP	 				= "短路 Short-Circuit";
+const AnsiString MSG_DUT_OVP_OCP	 			= "[OVP]短路 [OVP]Short-Circuit";
+const AnsiString MSG_DUT_OPEN_CIRCUIT	 		= "開路 Open-Circuit";
+const AnsiString MSG_NOT_FIND_ZEBRA_BOARD 		= "找不到治具測試板 Not Find Fixtures";
+const AnsiString MSG_NOT_FIND_PSU 				= "找不到電源供應器 Not Find PSU";
+const AnsiString MSG_PSU_NO_RESPOND 			= "電源供應器沒有回應 PSU No Response";
+const AnsiString MSG_NOT_FIND_SET_INI 			= "設定ini檔錯誤 INI-File Error";
+const AnsiString MSG_CURRENT_SETTING_FAIL		= "電源供應器設定的電流範圍錯誤 Current-Range-Value Error";
+const AnsiString MSG_CHECK_LED_COLOR_CHINESE 	= "請確認產品LED顏色";
+const AnsiString MSG_CHECK_LED_COLOR_ENGLISH 	= "Please confirm the color of product’s LED";
+
+typedef struct _ITEM_AD_DESCRIPOR
+{
+  bool	 bTest;
+  bool   bPASS;
+  DWORD	 dwADPortNum;
+  DWORD  dwADValue;
+  double dbVoltageMax;
+  double dbVoltageMin;
+  double dbLossVoltage;
+  double dbBitVoltage;
+
+  double dbVoltageValue;
+  AnsiString Name;
+}ITEM_AD_DESCRIPOR;
+
+typedef struct _PSU_DESCRIPOR
+{
+  AnsiString Name;
+  double dbVoltage;
+  double dbSurgeCurrent;
+  double dbCurrent;
+  DWORD	 dwDelayTime;
+  double dbCurrentMin;
+  double dbCurrentMax;
+  bool bOCP;
+  DWORD	 dwPASSCount;
+}PSU_DESCRIPOR;
+
+typedef struct _ITEM_DESCRIPOR
+{
+  AnsiString FileName;
+  DWORD		 dwPSUCount;
+  DWORD TestADItemNum;
+  PSU_DESCRIPOR PPSU_DESCRIPOR[2];
+  ITEM_AD_DESCRIPOR PITEM_AD_DESCRIPOR[15];
+}ITEM_DESCRIPOR;
+
+typedef struct _ITEM_SWITCH_SETTING
+{
+  bool Enable;
+  AnsiString Message;
+  DWORD DetectADIndex;
+  double DetectADValue;
+}ITEM_SWITCH_SETTING;
+
+typedef struct _INI_DESCRIPOR
+{
+  AnsiString ININame;
+  double dbH_BitVoltage;
+  double dbL_BitVoltage;
+  //
+  DWORD dwLoopDelay;
+  ITEM_SWITCH_SETTING PITEM_SWITCH_SETTING;
+  //
+
+  DWORD dwPSUSettingCount;
+  DWORD dwNowTestItemIndex;
+  ITEM_DESCRIPOR PITEM_DESCRIPOR[2];
+  queue<AnsiString> queDetail;
+
+}INI_DESCRIPOR;
+
+
+//---------------------------------------------------------------------------
+
+
+
+
+#define MB_WARNING(handle, msg) MessageBox(handle, msg, MB_CAPTIONWARNING, MB_ICONWARNING)
+//---------------------------------------------------------------------------
+#endif

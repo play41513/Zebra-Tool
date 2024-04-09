@@ -1,0 +1,1130 @@
+﻿//---------------------------------------------------------------------------
+#include <windows.h>    // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <SetupAPI.h> // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <cfgmgr32.h> // 安全移除USB裝置用 *要比 vcl.h 早編譯
+#include <vcl.h>
+#pragma hdrstop
+
+#include "main.h"
+#include <string>
+#include "MessageBox.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma link "Gauges"
+#pragma link "cspin"
+#pragma resource "*.dfm"
+TFrmMain *FrmMain;
+
+extern DWORD WINAPI WORKTESTExecute(LPVOID Param);
+
+//UI調整參數
+int VOLTAGE_TOLERANCE_RANGE = 20;
+bool bAutoStart,bError;
+AnsiString CB_DUT_NAME,CB_INDEX;
+//---------------------------------------------------------------------------
+__fastcall TFrmMain::TFrmMain(TComponent* Owner)
+	: TForm(Owner)
+{
+	FrmMain->Caption = APP_TITLE;
+}
+void __fastcall TFrmMain::EnumHID(){
+	HDEVINFO hDevInfo;
+	SP_DEVINFO_DATA DeviceInfoData;
+	DWORD i,j;
+	AnsiString SS,USBPath;
+	PSP_DEVICE_INTERFACE_DETAIL_DATA   pDetail   =NULL;
+	GUID GUID_USB_HID =StringToGUID(GUID_HID);
+	DEBUG("[ HID裝置列舉 ]");
+	ckbAuto->Checked = false;
+	//--------------------------------------------------------------------------
+	//   獲取設備資訊
+	hDevInfo = SetupDiGetClassDevs((LPGUID)&GUID_USB_HID,
+	0,   //   Enumerator
+	0,
+	DIGCF_PRESENT | DIGCF_DEVICEINTERFACE );
+	if   (hDevInfo   ==   INVALID_HANDLE_VALUE){
+		DEBUG("ERROR - SetupDiGetClassDevs()"); //   查詢資訊失敗
+	}
+	else{
+	//--------------------------------------------------------------------------
+		SP_DEVICE_INTERFACE_DATA   ifdata;
+		DeviceInfoData.cbSize   =   sizeof(SP_DEVINFO_DATA);
+		for (i=0;SetupDiEnumDeviceInfo(hDevInfo, i, &DeviceInfoData);i++)	//   枚舉每個USB設備
+		{
+			ULONG   len;
+			CONFIGRET cr;
+			PNP_VETO_TYPE   pnpvietotype;
+			CHAR   vetoname[MAX_PATH];
+			ULONG   ulStatus;
+			ULONG   ulProblemNumber;
+			ifdata.cbSize   =   sizeof(ifdata);
+			if (SetupDiEnumDeviceInterfaces(								//   枚舉符合該GUID的設備介面
+			hDevInfo,           //   設備資訊集控制碼
+			NULL,                         //   不需額外的設備描述
+			(LPGUID)&GUID_USB_HID,//GUID_CLASS_USB_DEVICE,                     //   GUID
+			(ULONG)i,       //   設備資訊集裏的設備序號
+			&ifdata))                 //   設備介面資訊
+			{
+				ULONG predictedLength   =   0;
+				ULONG requiredLength   =   0;
+				//   取得該設備介面的細節(設備路徑)
+				SetupDiGetInterfaceDeviceDetail(hDevInfo,         //   設備資訊集控制碼
+					&ifdata,          //   設備介面資訊
+					NULL,             //   設備介面細節(設備路徑)
+					0,         	      //   輸出緩衝區大小
+					&requiredLength,  //   不需計算輸出緩衝區大小(直接用設定值)
+					NULL);            //   不需額外的設備描述
+				//   取得該設備介面的細節(設備路徑)
+				predictedLength=requiredLength;
+				pDetail = (PSP_INTERFACE_DEVICE_DETAIL_DATA)::GlobalAlloc(LMEM_ZEROINIT,   predictedLength);
+				pDetail->cbSize   =   sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+
+				if(SetupDiGetInterfaceDeviceDetail(hDevInfo,         //   設備資訊集控制碼
+					&ifdata,             //   設備介面資訊
+					pDetail,             //   設備介面細節(設備路徑)
+					predictedLength,     //   輸出緩衝區大小
+					&requiredLength,     //   不需計算輸出緩衝區大小(直接用設定值)
+					NULL))               //   不需額外的設備描述
+				{
+					try
+					{
+						char   ch[512];
+						for(j=0;j<predictedLength;j++)
+						{
+						ch[j]=*(pDetail->DevicePath+8+j);
+						}
+						SS=ch;
+						DEBUG(SS);
+						if(strstr(SS.c_str(),AnsiString(PD_BOARD_PVID).SubString(5,AnsiString(PD_BOARD_PVID).Length()).c_str()))
+						{
+							ckbAuto->Checked = true;
+						}
+					}
+					catch(...)
+					{
+                    	DEBUG("列舉失敗");
+                    }
+				}
+				else
+				{
+					DEBUG("SetupDiGetInterfaceDeviceDetail F");
+				}
+			}
+			else
+			{
+				DEBUG("SetupDiEnumDeviceInterfaces F");
+			}
+		}
+	}
+	if(!ckbAuto->Checked)
+	{
+		pl_Msg->Visible = true;
+		pl_Msg->Font->Color = clRed;
+		pl_Msg->Caption = MSG_NOT_FIND_ZEBRA_BOARD;
+	}
+	else
+	{
+		pl_Msg->Visible = false;
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::MyWindowProc(TMessage& Message){
+	PDEV_BROADCAST_DEVICEINTERFACE pDevInf;
+	AnsiString DBCC_Name;
+
+	pDevInf =(PDEV_BROADCAST_DEVICEINTERFACE)Message.LParam;
+
+	//
+	if (Message.Msg==WM_DEVICECHANGE){
+		if(Message.WParam ==DBT_DEVICEARRIVAL){
+			if(AnsiString(pDevInf->dbcc_name).Length()>0)
+			{
+				DBCC_Name =AnsiString(pDevInf->dbcc_name).LowerCase();
+				if(strstr(DBCC_Name.c_str(),AnsiString(PD_BOARD_PVID).c_str()))
+				{
+					EnumHID();
+					DEBUG("Zebra Board Is Plugins");
+				}
+			}
+		}
+		else if(Message.WParam ==DBT_DEVICEREMOVECOMPLETE){
+			DBCC_Name =AnsiString(pDevInf->dbcc_name).LowerCase();
+			if(strstr(DBCC_Name.c_str(),AnsiString(PD_BOARD_PVID).c_str()))
+			{
+				if(m_hid.m_online) HID_TurnOff();
+				EnumHID();
+			}
+		}
+
+	}
+	// 繼續原始訊息的分派
+	TFrmMain::WndProc(Message);
+}
+//---------------------------------------------------------------------------
+bool TFrmMain::HID_TurnOn(){
+	//配置HID物件
+	wchar_t HID_PID[5];
+	wchar_t HID_VID[5];
+	wcsncpy(HID_PID,PD_BOARD_PVID+8,4);
+	wcsncpy(HID_VID,PD_BOARD_PVID+17,4);
+	HID_PID[4]='\0';
+	HID_VID[4]='\0';
+
+	if(m_hid.Configure(HID_PID,HID_VID,L"",L"")){
+		if(!m_hid.Open()){
+			//MessageBox(this->Handle, _T("開啟 HID 物件失敗!"), Application->Title.t_str(), MB_ICONWARNING);
+			return false;
+        }
+	}else{
+		//MessageBox(this->Handle, _T("配置 HID 物件失敗!"), Application->Title.t_str(), MB_ICONWARNING);
+		return false;
+	}
+	HID_PID[4] = 0;
+	HID_PID[4] = 0;
+
+	return true;
+}
+void TFrmMain::HID_TurnOff(){
+	m_hid.Close();
+}
+//---------------------------------------------------------------------------
+void TFrmMain::Tx(AnsiString Value,bool DEBUG){
+	int szTx, szCmd;
+	unsigned char * cmd;
+	TStringList * list;
+
+	szTx = m_hid.GetTxBytes();
+	m_or.AllocBuf(szTx);
+	cmd = (unsigned char *)m_or.GetBufAddr();
+
+	list = new TStringList();
+	list->DelimitedText = Value;
+
+	if(list->Count > szTx){
+		szCmd = szTx;
+	}else{
+        szCmd = list->Count;
+	}
+
+	for(int i=0; i<szCmd; i++){
+		list->Strings[i] = L"0x" + list->Strings[i];
+		cmd[i] = list->Strings[i].ToInt();
+	}
+
+	HidD_SetOutputReport(m_hid.m_hWrite, cmd, szTx);
+	UI_DisplayCmd(cmd, szTx,DEBUG);
+
+	delete list;
+}
+void __fastcall TFrmMain::UI_DisplayCmd(unsigned char *pBuf, int size,bool DEBUG){
+	String str, str2;
+	str = _T("寫入 : ");
+
+	for(int i=0; i<size; i++){
+		if(i == 0){
+			str2.printf(_T("%02X"), pBuf[i]);
+		}else{
+			str2.printf(_T(" %02X"), pBuf[i]);
+		}
+
+		str += str2;
+	}
+
+	if(DEBUG) DEBUG(str);
+}
+//---------------------------------------------------------------------------
+bool TFrmMain::Rx(AnsiString Value,bool DEBUG)
+{
+	DWORD nBytes;
+	bool bl=false;
+
+	if(!m_ir.AllocBuf(m_hid.GetRxBytes())){
+		MessageBox(NULL, _T("FAIL!"), _T("Allocate read buffer"), MB_ICONSTOP);
+		return false;
+	}
+
+	if(m_ir.Read(m_hid.m_hRead)){
+		if(HID_ReadReport(Value,DEBUG)) bl = true;
+	}else{
+		if(GetLastError() == ERROR_IO_PENDING){
+			WaitForSingleObject(m_hid.m_hRead, 1000);
+			if(GetOverlappedResult(m_hid.m_hRead, &m_ir, &nBytes, false)){
+				if(HID_ReadReport(Value,DEBUG)) bl = true;
+			}
+			CancelIo(m_hid.m_hRead);
+		}
+	}
+	return bl;
+}
+bool __fastcall TFrmMain::HID_ReadReport(AnsiString Value,bool DEBUG){
+	String buf, buf2;
+	const unsigned char *report = (const unsigned char *)m_ir.GetBufAddr();
+
+	buf = _T("讀取 : ");
+
+	for(int i=0; i!=m_ir.GetBufSize(); i++){
+		if(i==0){
+			buf2.printf(_T("%02X"), report[i]);
+		}else{
+			buf2.printf(_T(" %02X"), report[i]);
+		}
+
+		buf += buf2;
+	}
+	if(DEBUG) DEBUG(buf);
+
+	AnsiString buf3 = AnsiString(buf.c_str());
+	if(Value!="")
+	{
+		if(!strcmp(buf3.SubString(8,Value.Length()).c_str(),Value.c_str()))
+			return true;
+		else return false;
+	}
+	else
+	{
+		Rx_ValueAnalyze(buf3.SubString(8,23));
+		return true;
+	}
+}
+void TFrmMain::Rx_ValueAnalyze(AnsiString Value){
+	m_ADValue = HexToInt(Value.SubString(19,2)+Value.SubString(22,2)) ;
+}
+//---------------------------------------------------------------------------
+void TFrmMain::Voltage_Test(AnsiString CMD,TPanel *pl_main,TPanel *pl_read,double MinVoltage,double MaxVoltage)
+{
+	int step = HID_IS_ONLINE;
+	bool bl = true;
+	DWORD timeout;
+	bool bTryAgain = false;
+	bool bDEBUG;
+
+	m_ADValue ="";
+	if(MinVoltage != NULL) pl_read->Caption = "Test...";
+
+	while(bl)
+	{
+		switch(step)
+		{
+			case HID_IS_ONLINE:
+				if(m_hid.m_online) step = CHANGE_AD_PORT;
+				else step = HID_TURN_ON;
+				break;
+			case HID_TURN_ON:
+				if(HID_TurnOn()) step = CHANGE_AD_PORT;
+				else
+					step = HID_NOT_FIND;
+				break;
+			case CHANGE_AD_PORT:
+				bDEBUG = MinVoltage!=NULL ? true : false;
+				Tx(CMD,bDEBUG);
+				if(Rx(CMD,bDEBUG)) step = READ_AD_VALUE;
+				else step = TEST_VOLTAGE_FAIL;
+				timeout = GetTickCount()+GET_VALUE_TIMEOUT_MS;
+				break;
+			case READ_AD_VALUE:
+				bDEBUG = MinVoltage!=NULL ? true : false;
+				Tx(ReadADValue,bDEBUG);
+				Rx("",bDEBUG);
+				if(!strcmp(AnsiString(pl_main->Hint).c_str(),"H"))
+					m_ADValue.printf("%.2f",H_HARDWARE_VOLTAGE_COMPENSATION(m_ADValue));
+				else
+					m_ADValue.printf("%.2f",L_HARDWARE_VOLTAGE_COMPENSATION(m_ADValue));
+				// K Value
+					if(((TEdit *)FindComponent("plPN_" + IntToStr(pl_read->Tag)))->Text.Pos("+"))
+						m_ADValue.printf("%.2f", m_ADValue.ToDouble()+((TEdit *) FindComponent("edt_KValue_" + IntToStr(pl_read->Tag)))->Text.ToDouble());
+					else m_ADValue.printf("%.2f", m_ADValue.ToDouble()-((TEdit *) FindComponent("edt_KValue_" + IntToStr(pl_read->Tag)))->Text.ToDouble());
+				//
+				if(bDEBUG)
+				{
+					DEBUG("Voltage Value : "+m_ADValue+" V");
+					if(atof(m_ADValue.c_str())>= MinVoltage && atof(m_ADValue.c_str()) <= MaxVoltage)
+						step = TEST_VOLTAGE_PASS;
+					else if(GetTickCount() > timeout) step = TEST_VOLTAGE_FAIL;
+				}
+				else step = TEST_VOLTAGE_PASS;
+
+				break;
+			case TEST_VOLTAGE_PASS:
+				if(MinVoltage!=NULL)
+					pl_main->Font->Color = clGreen;
+				if(atof(m_ADValue.c_str())<0) m_ADValue = "0.00";
+				pl_read->Caption = m_ADValue;
+				bl =false;
+				break;
+			case TEST_VOLTAGE_FAIL:
+				if(!bTryAgain)
+				{
+					bTryAgain = true;
+					step = CHANGE_AD_PORT;
+					break;
+                }
+				pl_main->Font->Color = clRed;
+				if(atof(m_ADValue.c_str())<0) m_ADValue = "0.00";
+				pl_read->Caption = m_ADValue;
+				bl =false;
+				bError = true;
+				ERROR_MSG = MSG_VOLTAGE_FAIL;
+				break;
+			case HID_NOT_FIND:
+				pl_main->Font->Color = clRed;
+				pl_read->Caption = "FAIL";
+				bl =false;
+				if(pl_AD15->Visible) ckbAuto->Checked = false;
+				bError = true;
+				ERROR_MSG = MSG_NOT_FIND_ZEBRA_BOARD;
+				break;
+		}
+	}
+}
+void __fastcall TFrmMain::btnStartClick(TObject *Sender)
+{
+	int i;
+	for(i=0;i <= 14 ;i++)
+	{
+		TPanel * pl_main = ((TPanel *)FindComponent("plAD" + IntToStr(i)));
+		TPanel * pl_read = ((TPanel *)FindComponent("pl_read_voltage_ad_" + IntToStr(i)));
+		pl_main->Font->Color = clWindowText;
+		pl_read->Caption = "";
+	}
+	for(i = 0;i <= 14;i++)
+	{
+		TPanel * pl_main = ((TPanel *)FindComponent("plAD" + IntToStr(i)));
+		TPanel * pl_read = ((TPanel *)FindComponent("pl_read_voltage_ad_" + IntToStr(i)));
+		TPanel * pl_auto = ((TPanel *)FindComponent("pl_Auto" + IntToStr(i)));
+		if(pl_auto->Caption == "V")
+			plAD0Click(pl_main);
+		if(pl_read->Caption == "FAIL")
+		{
+			bError = true;
+			for(int j =i+1;j < 5;j++)
+			{
+				TPanel * pl_auto2 = ((TPanel *)FindComponent("pl_Auto" + IntToStr(j)));
+				if(pl_auto2->Caption == "V")
+				{
+					pl_main->Font->Color = clRed;
+					pl_read->Caption = "FAIL";
+                }
+			}
+			break;
+		}
+		Delay(1);
+	}
+}
+
+//---------------------------------------------------------------------------
+bool TFrmMain::ReadInISet()
+{
+	if(FileExists(FILE_DUT_SET_INI))
+	{
+		try
+		{
+			AnsiString DEFAULT_DEVICE="[DEVICE] "+Findfilemsg(FILE_DUT_SET_INI,"[DEFAULT DEVICE]",1);
+			for(int i = 0 ;i < 15;i++)
+			{
+				TPanel * pl_auto  = ((TPanel *)FindComponent("pl_Auto" + IntToStr(i)));
+				TPanel * pl_pin  = ((TPanel *)FindComponent("pl_pin" + IntToStr(i)));
+				TEdit  * edtADSetMin = ((TEdit *)FindComponent("edtADSetMin" + IntToStr(i)));
+				TEdit  * edtADSetMax = ((TEdit *)FindComponent("edtADSetMax" + IntToStr(i)));
+				TEdit  * plPN        = ((TEdit *)FindComponent("plPN_" + IntToStr(i)));
+				TEdit  * edtKValue   = ((TEdit *)FindComponent("edt_KValue_" + IntToStr(i)));
+				AnsiString SET = Findfilemsg(FILE_DUT_SET_INI,DEFAULT_DEVICE,i+1);
+				TStringList *sList = new TStringList();
+				sList->Delimiter = ' ';
+				sList->DelimitedText = SET;
+				pl_auto->Caption = sList->Strings[1].ToInt() == 1 ? "V":"";
+				pl_pin->Caption  = sList->Strings[2];
+				edtADSetMin->Text = sList->Strings[3];
+				edtADSetMax->Text = sList->Strings[4];
+				plPN->Text        = sList->Strings[5];
+				edtKValue->Text   = sList->Strings[6];
+				delete sList;
+			}
+			AnsiString sTemp = Findfilemsg(FILE_DUT_SET_INI,DEFAULT_DEVICE,16);
+			edtPSUVol->Text = sTemp.SubString(11,sTemp.Pos("~")-11);
+			edtPSUCur->Text = sTemp.SubString(sTemp.Pos("~")+1,sTemp.Length());
+
+			sTemp = Findfilemsg(FILE_DUT_SET_INI,DEFAULT_DEVICE,17);
+			edt_min->Text = sTemp.SubString(15,sTemp.Pos("~")-15);
+			edt_max->Text = sTemp.SubString(sTemp.Pos("~")+1,sTemp.Length());
+
+			sTemp = Findfilemsg(FILE_DUT_SET_INI,DEFAULT_DEVICE,18);
+			edtPSUCur2->Text = sTemp.SubString(9,sTemp.Length()-8);
+
+			sTemp = Findfilemsg(FILE_DUT_SET_INI,DEFAULT_DEVICE,19);
+			psu_out_delay_time = (sTemp.SubString(22,sTemp.Length()-21)).ToInt();
+
+			//get_All_Dut_Name for combobox
+			ifstream imsgfile(FILE_DUT_SET_INI.c_str());
+			std::string msg;
+			if (imsgfile.is_open()) {
+				cbDefault_Device->Items->Clear();
+				while (!imsgfile.eof()) {
+					getline(imsgfile, msg);
+
+					if (strstr(msg.c_str(),"[DEVICE] "))
+					cbDefault_Device->Items->Add(AnsiString(msg.substr(9,msg.length()).c_str()));
+				}
+				imsgfile.close();
+			}
+			for(int count=0;count<cbDefault_Device->Items->Count;count++)
+			{
+				cbDefault_Device->ItemIndex=count;
+				if(strstr(((AnsiString)"[DEVICE] "+cbDefault_Device->Text).c_str(),DEFAULT_DEVICE.c_str()))
+				break;
+			}
+			return true;
+		}
+		catch(...)
+		{
+			return false;
+		}
+	}
+	else return false;
+}
+bool TFrmMain::SetInIVal(AnsiString DUTNAME){
+		if(DUTNAME=="") return false;
+		bool bModify = false;
+		int item_count=0,dut_info_count;
+		AnsiString totalmsg = ""; // 檔案內容
+		AnsiString item_name=DUTNAME;
+		ifstream imsgfile(FILE_DUT_SET_INI.c_str());
+		std::string msg;
+		if (imsgfile.is_open()) {
+			while (!imsgfile.eof()) {
+				getline(imsgfile, msg);
+				item_count++;
+				if (item_count==1) {
+					totalmsg +=  AnsiString(msg.c_str());
+				}
+				else if (item_count==2) {
+					totalmsg +=  "\n" + item_name ;
+				}
+				else if (!strcmp(("[DEVICE] "+item_name).c_str(),msg.c_str())) {
+					bModify = true;
+					totalmsg +=  "\n" + AnsiString(msg.c_str());
+					dut_info_count = 0;
+				}
+				else if (bModify) {
+					if(dut_info_count <15)
+					{
+						TPanel * pl_auto  	 = ((TPanel *)FindComponent("pl_Auto" + IntToStr(dut_info_count)));
+						TPanel * pl_pin  	 = ((TPanel *)FindComponent("pl_pin" + IntToStr(dut_info_count)));
+						TEdit  * edtADSetMin = ((TEdit *)FindComponent("edtADSetMin" + IntToStr(dut_info_count)));
+						TEdit  * edtADSetMax = ((TEdit *)FindComponent("edtADSetMax" + IntToStr(dut_info_count)));
+						TEdit  * plPN        = ((TEdit *)FindComponent("plPN_" + IntToStr(dut_info_count)));
+						TEdit  * edtKValue   = ((TEdit *)FindComponent("edt_KValue_" + IntToStr(dut_info_count)));
+						AnsiString Auto = pl_auto->Caption == "V" ? "1 ":"0 ";
+						totalmsg +=  "\n" + AnsiString(msg.c_str()).SubString(1,7) + Auto + pl_pin->Caption +" "+edtADSetMin->Text+" "+edtADSetMax->Text+" "+plPN->Text+" "+edtKValue->Text;
+						dut_info_count++;
+					}
+					else if(dut_info_count ==15)
+					{
+						totalmsg +=  "\n[PSU-SET] " + edtPSUVol->Text + "~" + edtPSUCur->Text;
+						dut_info_count++;
+					}
+					else if(dut_info_count ==16)
+					{
+						totalmsg +=  "\n[DUT-CURRENT] "+ edt_min->Text + "~" + edt_max->Text;
+						dut_info_count++;
+					}
+					else if(dut_info_count ==17)
+					{
+						totalmsg +=  "\n[OCP-2] "+ edtPSUCur2->Text;
+						dut_info_count++;
+					}
+					else
+					{
+						bModify = false;
+						totalmsg +=  "\n[PSU-OUT-DELAY-TIME] "+ AnsiString(psu_out_delay_time);
+					}
+				}
+				else
+					totalmsg +=  "\n" + AnsiString(msg.c_str());
+			}
+			imsgfile.close();
+		}
+		// 寫入檔案
+		ofstream omsgfile(FILE_DUT_SET_INI.c_str());
+		omsgfile << totalmsg.c_str();
+		omsgfile.close();
+		return true;
+}
+AnsiString TFrmMain::Findfilemsg(AnsiString filename, AnsiString findmsg,
+	int rownum) { // 找檔案找到字串行回傳幾行後的字串
+	ifstream lanfile(filename.c_str());
+	std::string filemsg;
+	if (lanfile.is_open()) {
+		while (!lanfile.eof()) {
+			getline(lanfile, filemsg);
+			if (strstr(filemsg.c_str(), findmsg.c_str())) {
+				for (int i = 0; i < rownum; i++)
+					getline(lanfile, filemsg);
+				lanfile.close();
+				return(AnsiString)filemsg.c_str();
+			}
+		}
+		lanfile.close();
+		return NULL;
+	}
+	else
+		return "FAIL";
+}
+void __fastcall TFrmMain::FormClose(TObject *Sender, TCloseAction &Action)
+{
+	SetInIVal(cbDefault_Device->Text);
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::plAD0Click(TObject *Sender)
+{
+	TPanel* pl=(TPanel*)Sender;
+	pl->Font->Color = clWindowText;
+	int numBtn = pl->Name.SubString(5,pl->Name.Length()).ToInt();
+	if(numBtn ==15 ) Voltage_Test(CHANGE_AD_PORT_NUM+IntToHex(numBtn,2),pl,pl_read_voltage_ad_15,NULL,NULL);
+	else if(numBtn <=14)
+	{
+		TPanel * pl_auto = ((TPanel *)FindComponent("pl_Auto" + IntToStr(numBtn)));
+		TPanel * pl_read_value = ((TPanel *)FindComponent("pl_read_voltage_ad_" + IntToStr(numBtn)));
+		double minvoltage = ((TEdit *)FindComponent("edtADSetMin" + IntToStr(numBtn)))->Text.ToDouble();
+		double maxvoltage = ((TEdit *)FindComponent("edtADSetMax" + IntToStr(numBtn)))->Text.ToDouble();
+
+		Voltage_Test(CHANGE_AD_PORT_NUM+IntToHex(numBtn,2),pl,pl_read_value,minvoltage,maxvoltage);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::Timer1Timer(TObject *Sender)
+{
+	if(!bAutoStart)
+	{
+		plAD0Click(plAD15);
+		if(atof(AnsiString(pl_read_voltage_ad_15->Caption).c_str())< 1&&!bAutoStart&&Timer1->Enabled&&pl_read_voltage_ad_15->Caption!="")
+		{
+			pl_Staus->Caption = "起測";
+			//參數 UI 初始化
+			ERROR_MSG = "";
+			pl_Msg->Visible = false;
+			pl_Msg->Caption = "";
+			pl_Msg->Font->Color = clWindowText;
+			bError = false;
+			plAD15->Font->Color = clLime;
+			bAutoStart = true;
+			FrmMain->pl_sys_power->Color = clSkyBlue;
+			FrmMain->pl_sys_power->Caption = "System Power";
+			for(int i=0;i <= 14 ;i++)
+			{
+				TPanel * pl_main = ((TPanel *)FindComponent("plAD" + IntToStr(i)));
+				TPanel * pl_read = ((TPanel *)FindComponent("pl_read_voltage_ad_" + IntToStr(i)));
+				pl_main->Font->Color = clWindowText;
+				pl_read->Caption = "";
+			}
+			pl_result->Color   = clWhite;
+			pl_result->Caption = "Testing...";
+			int test_time = GetTickCount();
+			//
+
+			if(!PSU_Voltage_Test()||bCurFail)
+				btnStart->Click();
+			CL_PSU_CONTROL->PSU_Stop();
+			pl_result->Color   = bError ?  clRed  : clLime;
+			pl_result->Caption = bError ?  "FAIL" : "PASS";
+			if(bError)
+			{
+				pl_Msg->Visible = true;
+				pl_Msg->Font->Color = clRed;
+				pl_Msg->Caption = ERROR_MSG;
+			}
+			DEBUG("------"+AnsiString((float)(GetTickCount()-test_time)/1000)+"秒------");
+			pl_Staus->Caption = "測試結束";
+			FrmMain->Refresh();
+		}
+		while(bAutoStart)
+		{
+			plAD0Click(plAD15);
+			if(atof(AnsiString(pl_read_voltage_ad_15->Caption).c_str())> 1 ||!ckbAuto->Checked)
+			{
+				pl_Staus->Caption = "待測";
+				plAD15->Font->Color = clWindowText;
+				bAutoStart = false;
+				break;
+			}
+			Delay(100);
+		}
+	}
+}
+// PSU Test
+int TFrmMain::PSU_Voltage_Test()
+{
+	if(CL_PSU_CONTROL->open_psu_com())
+	{
+		DEBUG("Start Test...");
+		que_cmd.c.clear();
+		char buff[200];
+		sprintf(buff,"CHAN1:VOLTage %.4f\n",edtPSUVol->Text.ToDouble());      //設定電壓
+		que_cmd.push(buff);
+		sprintf(buff,"CHAN1:CURRent %.4f\n",edtPSUCur->Text.ToDouble()/1000); //設定電流
+		que_cmd.push(buff);
+		que_cmd.push("CHAN1:PROTection:CURRent 1\n");                         //OCP打開
+		que_cmd.push(":OUTPut:STATe 1\n");                                    //開始輸出
+		if(edtPSUCur2->Text.ToInt() != edtPSUCur->Text.ToInt())
+		{
+			sprintf(buff,"CHAN1:CURRent %.4f\n",edtPSUCur2->Text.ToDouble()/1000); //設定電流
+			que_cmd.push(buff);
+		}
+		if(psu_out_delay_time != 0)
+		{
+			que_cmd.push("Delay");
+        }
+		//測試
+		bError = CL_PSU_CONTROL->PSU_CMD_Test() ? false:true;
+		return bError;
+	}
+	else
+	{
+		DEBUG("ERROR : Not Find Device COM-PORT");
+		ERROR_MSG = MSG_NOT_FIND_PSU;
+		bError = true;
+		return bError;
+	}
+}
+
+
+//fun
+//---------------------------------------------------------------------------
+void TFrmMain::Delay(DWORD iMilliSeconds) // delay time
+{
+	DWORD iStart;
+	iStart = GetTickCount();
+	while (GetTickCount() - iStart <= iMilliSeconds)
+		Application->ProcessMessages();
+}
+//---------------------------------------------------------------------------
+int  TFrmMain::HexToInt(AnsiString HexStr) {//16進位轉10進位
+	int iIndex, iHex, totalChar;
+	TCHAR HexChar[8];
+
+	HexStr.UpperCase(); // 把字串轉成全大寫
+	_tcscpy_s(HexChar, 8, WideString(HexStr).c_bstr());
+//	strcpy(HexChar, HexStr.c_str()); // 把字串轉成字元陣列
+	iHex = 0;
+	totalChar = HexStr.Length(); // 取得字串的長度
+	for (iIndex = 0; iIndex < totalChar; iIndex++) {
+		iHex <<= 4;
+		if ((HexChar[iIndex] >= 0x30) && (HexChar[iIndex] <= 0x39)) {
+			iHex += (HexChar[iIndex] - 0x30); // 把 0 - 9 字元轉成數字
+		}
+		else if ((HexChar[iIndex] >= 0x41) && (HexChar[iIndex] <= 0x46)) {
+			iHex += (HexChar[iIndex] - 0x37); // ­把 A - F 字元轉成數字
+		}
+		else {
+			iHex = 0;
+			break;
+		}
+	}
+	return iHex;
+}
+//---------------------------------------------------------------------------
+
+// UI 調整及輸入字串偵錯
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::pl_Auto0Click(TObject *Sender)
+{
+	TPanel* pl=(TPanel*)Sender;
+	pl->Caption = pl->Caption == "V" ? "":"V";
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::ckbAutoClick(TObject *Sender)
+{
+	pl_AD15->Visible = ckbAuto->Checked ? true:false;
+	Timer1->Enabled = ckbAuto->Checked ? true:false;
+	//btnStart->Visible = ckbAuto->Checked ? false:true;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::edtADSetMin0Change(TObject *Sender)
+{
+	TEdit* edt=(TEdit*)Sender;
+	TCHAR HexChar[8];
+	bool bPASS = true;
+	bool bPoint = false;
+	if(edt->Text.Length() >= 5){
+		edt->Text = edt->Text.SubString(1,5);
+	}
+	if(edt->Text.Length() == 0){
+		bPASS =false;
+	}
+	else
+	{
+		edt->Text = edt->Text.UpperCase();// 把字串轉成全大寫
+		_tcscpy_s(HexChar, 8, edt->Text.c_str());
+		for(int j=0;j<edt->Text.Length();j++)
+		{
+			if(HexChar[j] < 0x30 || HexChar[j] > 0x39){
+				if(HexChar[j] == 0x2E)
+				{
+					if(j == edt->Text.Length()-1 ||bPoint)
+					{
+						edt->Font->Color = clRed;
+						edt-> SelStart=edt-> Text.Length();
+						bPASS = false;
+					}
+					if(!bPoint) bPoint = true;
+				}
+				else
+				{
+					edt->Font->Color = clRed;
+					edt-> SelStart=edt-> Text.Length();
+					bPASS = false;
+				}
+			}
+		}
+		//
+		if(edt->Name.SubString(12,edt->Name.Length()).ToInt() > 0 && edt->Name.SubString(12,edt->Name.Length()).ToInt() < 8 &&bPASS)
+		{
+			if(edt->Text.ToDouble()>6)
+			{
+				edt->Font->Color = clRed;
+				bPASS = false;
+			}
+		}
+		else if(edt->Name.SubString(12,edt->Name.Length()).ToInt() > 8 && edt->Name.SubString(12,edt->Name.Length()).ToInt() < 15 &&bPASS)
+		{
+			if(edt->Text.ToDouble()>6)
+			{
+				edt->Font->Color = clRed;
+				bPASS = false;
+			}
+		}
+		//
+	}
+	if(bPASS)
+	{
+		edt->Font->Color = edt->Text.ToDouble() <= 99 ? clBlue : clWindowText;
+	}
+
+	edt-> SelStart=edt-> Text.Length();
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TFrmMain::edtADSetMin0Exit(TObject *Sender)
+{
+	TEdit* edt=(TEdit*)Sender;
+	if(edt->Name.Pos("KValue"))
+	{
+		if(edt->Text.Length() == 0||edt->Font->Color == clRed||edt->Text=="0")
+		{
+			edt->Text = "0.00";
+			edt->Font->Color = clBlue;
+		}
+    }
+	else if(edt->Text.Length() == 0 || edt->Font->Color == clRed||edt->Text.ToDouble() <0.5){
+		edt->Text = "0.00";
+		edt->Font->Color = clBlue;
+	}
+	else
+	{
+		AnsiString edtnum = AnsiString(edt->Text.ToDouble());
+		edtnum.printf("%.2f",atof(edtnum.c_str()));
+		edt->Text =  edtnum;
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::pl_Set_SwitchClick(TObject *Sender)
+{
+	FrmMain->AutoSize =false;
+	if(pl_Right->Width)
+	{
+	   pl_Right->Width = 0;
+	   pl_Set_Switch ->Caption =">";
+	   FrmMain->Width -=514;
+	   FrmMain->Height = 323;
+	}
+	else
+	{
+	   pl_Right->Width = 514;
+	   pl_Set_Switch ->Caption ="<";
+	   FrmMain->Width +=514;
+	   FrmMain->Height = 720;
+	}
+	FrmMain->AutoSize =true;
+}
+//---------------------------------------------------------------------------
+
+
+
+void __fastcall TFrmMain::moDebugChange(TObject *Sender)
+{
+	if(moDebug->Lines->Count >500)
+	{
+		moDebug->Clear();
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::btnSetClick(TObject *Sender)
+{
+	if(btnSet->Caption == "Enter")
+	{
+		if(edtPassWord->Text.UpperCase() == PASSWORD)
+		{
+			btnSet->Caption		 = "END";
+			SetValueEnabled(true);
+		}
+		else if(edtPassWord->Text.UpperCase() == MTTWORD)
+		{
+			btnSet->Caption		 = "END";
+			edtPassWord->Enabled = false;
+			for(int i=0 ; i<15 ;i++)
+				((TEdit *) FindComponent("edt_KValue_" + IntToStr(i)))->Enabled = true;
+			pl_KValue->Width = 117;
+		}
+		else edtPassWord->Font->Color = clRed;
+	}
+	else
+	{
+		if(edt_max->Text.ToInt()>edt_min->Text.ToInt())
+		{
+			btnSet->Caption	  	= "Enter";
+			edtPassWord->Text 	= "";
+			SetValueEnabled(false);
+			SetInIVal(cbDefault_Device->Text);
+			if(pl_KValue->Width)
+			{
+				for(int i=0 ; i<15 ;i++)
+					((TEdit *) FindComponent("edt_KValue_" + IntToStr(i)))->Enabled = false;
+				pl_KValue->Width = 0;
+			}
+		}
+		else MessageBoxA(NULL,MSG_CURRENT_SETTING_FAIL.c_str(),"WARNING", MB_ICONEXCLAMATION);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::edtPassWordEnter(TObject *Sender)
+{
+	if(edtPassWord->Font->Color == clRed)
+	{
+		edtPassWord->Font->Color = clBlue;
+		edtPassWord->Text 	= "";
+	}
+}
+//---------------------------------------------------------------------------
+void  TFrmMain::SetValueEnabled(bool Enabled)
+{
+	edtPassWord->Enabled = !Enabled;
+	for(int i=0 ; i<15 ;i++)
+	{
+		TEdit   * edtADSetMin = ((TEdit *) FindComponent("edtADSetMin" + IntToStr(i)));
+		TEdit   * edtADSetMax = ((TEdit *) FindComponent("edtADSetMax" + IntToStr(i)));
+		TPanel  * plAuto   = ((TPanel *)FindComponent("pl_Auto" + IntToStr(i)));
+		plAuto->Enabled	  = Enabled;
+		edtADSetMin->Enabled = Enabled;
+		edtADSetMax->Enabled = Enabled;
+	}
+	edt_min->Enabled = Enabled;
+	edt_max->Enabled = Enabled;
+	edtPSUVol ->Enabled = Enabled;
+	edtPSUCur ->Enabled = Enabled;
+	edtPSUCur2->Enabled = Enabled;
+
+}
+
+//---------------------------------------------------------------------------
+void TFrmMain::MODIFY_DEFAULT_VALUE() {
+   //修改 DEFAULT DEVICE
+	int item_count=0;
+	AnsiString totalmsg = ""; // 檔案內容
+	AnsiString item_name=(AnsiString)cbDefault_Device->Text;
+	ifstream imsgfile(FILE_DUT_SET_INI.c_str());
+	std::string msg;
+	if (imsgfile.is_open()) {
+		while (!imsgfile.eof()) {
+			getline(imsgfile, msg);
+			item_count++;
+			if (item_count==1) {
+				totalmsg +=  AnsiString(msg.c_str());
+			}
+			else if (item_count==2) {
+				totalmsg +=  "\n" + item_name ;
+			}
+			else
+				totalmsg +=  "\n" + AnsiString(msg.c_str());
+		}
+		imsgfile.close();
+	}
+	// 寫入檔案
+	ofstream omsgfile(FILE_DUT_SET_INI.c_str());
+	omsgfile << totalmsg.c_str();
+	omsgfile.close();
+}
+
+void __fastcall TFrmMain::cbDefault_DeviceExit(TObject *Sender)
+{
+	cbDefault_Device->Style = csDropDownList;
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::cbDefault_DeviceSelect(TObject *Sender)
+{
+	MODIFY_DEFAULT_VALUE();
+	ReadInISet();
+	CB_DUT_NAME =  cbDefault_Device->Text;
+	CB_INDEX = cbDefault_Device->ItemIndex ;
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TFrmMain::edt_minChange(TObject *Sender)
+{
+	TEdit* edt=(TEdit*)Sender;
+	edt->Font->Color = clBlue;
+	TCHAR HexChar[8];
+	bool bPASS = true;
+	if(edt->Text.Length() == 0){
+		bPASS =false;
+	}
+	else
+	{
+		edt->Text = edt->Text.UpperCase();// 把字串轉成全大寫
+		_tcscpy_s(HexChar, 8, edt->Text.c_str());
+		for(int j=0;j<edt->Text.Length();j++)
+		{
+			if(HexChar[j] < 0x30 || HexChar[j] > 0x39){
+					edt->Font->Color = clRed;
+					edt-> SelStart=edt-> Text.Length();
+					bPASS = false;
+			}
+		}
+	}
+	if(bPASS)
+	{
+		if(edt->Text.Length()>4)
+			edt->Text = edt->Text.SubString(1,4);
+	}
+
+	edt-> SelStart=edt-> Text.Length();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFrmMain::edt_minExit(TObject *Sender)
+{
+	TEdit* edt=(TEdit*)Sender;
+	if(edt->Text.Length() == 0 || edt->Font->Color == clRed){
+		edt->Text = "0";
+		edt->Font->Color = clBlue;
+	}
+	else
+	{
+		AnsiString edtnum = AnsiString(edt->Text.ToInt());
+		edtnum.printf("%d",atoi(edtnum.c_str()));
+		edt->Text =  edtnum;
+	}
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TFrmMain::plPN_14Click(TObject *Sender)
+{
+	TPanel* pl=(TPanel*)Sender;
+	pl->Caption = pl->Caption == "+" ? "-":"+";
+	pl->Tag = pl->Caption=="+" ? 1:0;
+}
+//---------------------------------------------------------------------------
+bool TFrmMain::FindIniFile()
+{
+	TSearchRec Sr;
+	TStringList*FileList=new TStringList();
+	if(FindFirst("*.ini",faAnyFile,Sr)==0)
+	{
+		do
+		{
+			FileList->Add(Sr.Name);
+		}
+		while(FindNext(Sr)==0);
+		FindClose(Sr);
+	}
+	if(FileList->Count>1||FileList->Count==0)
+	{
+		delete FileList;
+		labIni->Font->Color = clRed;
+		labProduct->Font->Color = clRed;
+		return false;
+	}
+	else
+	{
+		FILE_DUT_SET_INI = FileList->Strings[0];
+		if(FILE_DUT_SET_INI.Length()>12)
+		{
+			int num = FILE_DUT_SET_INI.Pos("_");
+			labProduct->Caption = FILE_DUT_SET_INI.SubString(1,num-1);
+			labIni->Caption = FILE_DUT_SET_INI.SubString(num+1,FILE_DUT_SET_INI.Length()-num-4);
+		}
+		delete FileList;
+		return true;
+	}
+}
+
+void __fastcall TFrmMain::edtPassWordKeyDown(TObject *Sender, WORD &Key, TShiftState Shift)
+{
+	if(Key==13)
+	 btnSet->Click();
+	else edtPassWord->Font->Color = clBlue;
+}
+//---------------------------------------------------------------------------
+void __fastcall TFrmMain::FormShow(TObject *Sender)
+{
+	if(FindIniFile())
+	{
+		if(!ReadInISet())
+		{
+			if(frmMsg==NULL)  frmMsg = new TfrmMsg(Application);
+			frmMsg->plTitle->Caption = "INI設定檔內容錯誤，按下Ok結束程式";
+			frmMsg->Tag = 1;
+			frmMsg->ShowModal();
+			delete frmMsg;
+			frmMsg = NULL;
+			Close();
+		}
+		else
+		{
+			if(frmMsg==NULL)  frmMsg = new TfrmMsg(Application);
+			frmMsg->plTitle->Caption = "請確認待測物型號 :"+labProduct->Caption +" 是否正確。";
+			if(frmMsg->ShowModal()!=  mrOk) Close();
+			delete frmMsg;
+			frmMsg = NULL;
+		}
+	}
+	else
+	{
+		if(frmMsg==NULL)  frmMsg = new TfrmMsg(Application);
+		frmMsg->plTitle->Caption = "找不到INI設定檔，按下Ok結束程式";
+		frmMsg->Tag = 1;
+		frmMsg->ShowModal();
+		delete frmMsg;
+		frmMsg = NULL;
+		Close();
+	}
+
+	EnumHID();
+
+	FrmMain->OldWindowProc = WindowProc;
+	FrmMain->WindowProc = MyWindowProc;
+	GUID guid;
+	// 註冊USB HUB裝置
+	guid =StringToGUID(GUID_USB_HUB);
+	g_DeviceNogification.RegisterWindowsDeviceInterfaceNotification(
+		Handle,guid);
+
+	//USB Device
+	guid =StringToGUID(GUID_USB_DEVICE);
+	g_DeviceNogification.RegisterWindowsDeviceInterfaceNotification(
+		Handle,guid);
+
+	//HID Device
+	guid =StringToGUID(GUID_HID);
+	g_DeviceNogification.RegisterWindowsDeviceInterfaceNotification(
+		Handle,guid);
+}
+//---------------------------------------------------------------------------
+
+

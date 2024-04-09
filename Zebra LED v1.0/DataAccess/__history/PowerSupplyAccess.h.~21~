@@ -1,0 +1,23 @@
+//---------------------------------------------------------------------------
+
+#ifndef PowerSupplyAccessH
+#define PowerSupplyAccessH
+
+#include "SerialPortControlBase.h"
+#include "ConstantString.h"
+//---------------------------------------------------------------------------
+class PowerSupplyAccess
+{
+	private:
+		SerialPortControl *mSerialPortControl;
+		INI_DESCRIPOR *INI_Desc;
+	public:
+		PowerSupplyAccess::PowerSupplyAccess(INI_DESCRIPOR *ini);
+		bool CheckPSUIsOnline();
+		void ClosePower();
+		void ClosePowerSupply();
+		bool OpenPower();
+		bool SetParameter();
+		AnsiString GetValue();
+};
+#endif

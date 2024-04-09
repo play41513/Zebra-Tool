@@ -1,0 +1,26 @@
+開啟程式
+
+插入裝置
+
+選擇flash programmer
+
+Advanced Setting
+
+full erase 確認
+
+Erase
+
+Advanced Setting
+
+M..... 確認
+
+選擇BIOS
+
+program
+
+選擇flash 24k
+
+program
+
+BBUNLOCK解鎖!
+

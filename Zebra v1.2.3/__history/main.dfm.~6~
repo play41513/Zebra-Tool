@@ -1,0 +1,3412 @@
+object FrmMain: TFrmMain
+  Left = 0
+  Top = 0
+  BorderIcons = [biSystemMenu, biMinimize]
+  ClientHeight = 681
+  ClientWidth = 1233
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnClose = FormClose
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pl_Main: TPanel
+    Left = 0
+    Top = 0
+    Width = 709
+    Height = 681
+    Align = alClient
+    TabOrder = 0
+    object Panel7: TPanel
+      Left = 1
+      Top = 226
+      Width = 707
+      Height = 57
+      Align = alTop
+      TabOrder = 0
+      object pl_Msg: TPanel
+        Left = 276
+        Top = 1
+        Width = 430
+        Height = 55
+        Align = alRight
+        Color = clCream
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -33
+        Font.Name = #27161#26999#39636
+        Font.Style = []
+        ParentBackground = False
+        ParentFont = False
+        TabOrder = 0
+        Visible = False
+      end
+      object pl_Staus: TPanel
+        Left = 1
+        Top = 1
+        Width = 275
+        Height = 55
+        Align = alClient
+        Caption = #24453#28204
+        Color = clTeal
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clBlack
+        Font.Height = -33
+        Font.Name = #27161#26999#39636
+        Font.Style = []
+        ParentBackground = False
+        ParentFont = False
+        TabOrder = 1
+      end
+    end
+    object moDebug: TMemo
+      Left = 1
+      Top = 283
+      Width = 707
+      Height = 397
+      Align = alClient
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      ReadOnly = True
+      ScrollBars = ssBoth
+      TabOrder = 1
+      OnChange = moDebugChange
+    end
+    object pl_result: TPanel
+      Left = 1
+      Top = 1
+      Width = 707
+      Height = 225
+      Align = alTop
+      Caption = 'Wait...'
+      Color = clWhite
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clNavy
+      Font.Height = -93
+      Font.Name = 'Times New Roman'
+      Font.Style = [fsBold]
+      ParentBackground = False
+      ParentFont = False
+      TabOrder = 2
+    end
+    object pl_AD15: TPanel
+      Left = 493
+      Top = 606
+      Width = 224
+      Height = 55
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 3
+      Visible = False
+      object plAD15: TPanel
+        Tag = 15
+        Left = 1
+        Top = 1
+        Width = 64
+        Height = 53
+        Hint = 'L'
+        Align = alLeft
+        Caption = 'AD15'
+        Color = clCream
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -17
+        Font.Name = 'Times New Roman'
+        Font.Style = []
+        ParentBackground = False
+        ParentFont = False
+        TabOrder = 1
+        OnClick = plAD0Click
+      end
+      object pl_read_voltage_ad_15: TPanel
+        Left = 65
+        Top = 1
+        Width = 160
+        Height = 53
+        Align = alLeft
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlue
+        Font.Height = -27
+        Font.Name = 'Times New Roman'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+      end
+    end
+  end
+  object pl_Set_Switch: TPanel
+    Left = 709
+    Top = 0
+    Width = 10
+    Height = 681
+    Align = alRight
+    Caption = '<'
+    Color = clSkyBlue
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentBackground = False
+    ParentFont = False
+    TabOrder = 1
+    OnClick = pl_Set_SwitchClick
+  end
+  object pl_Right: TPanel
+    Left = 719
+    Top = 0
+    Width = 514
+    Height = 681
+    Align = alRight
+    TabOrder = 2
+    object plSet: TPanel
+      Left = 1
+      Top = 41
+      Width = 512
+      Height = 639
+      Align = alClient
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 0
+      object pl_PSU_title: TPanel
+        Left = 1
+        Top = 497
+        Width = 510
+        Height = 35
+        Align = alClient
+        TabOrder = 17
+      end
+      object Panel14: TPanel
+        Left = 1
+        Top = 466
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 16
+        object plAD14: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD14(J2-7)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax14: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin14: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto14: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_14: TPanel
+          Tag = 14
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin14: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel24: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel10: TPanel
+        Left = 1
+        Top = 435
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 15
+        object plAD13: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD13(J2-6)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax13: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin13: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto13: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_13: TPanel
+          Tag = 13
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin13: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel22: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel15: TPanel
+        Left = 1
+        Top = 404
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 14
+        object plAD12: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD12(J2-5)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax12: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin12: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto12: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_12: TPanel
+          Tag = 12
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin12: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel21: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel19: TPanel
+        Left = 1
+        Top = 373
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 13
+        object plAD11: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD11(J2-4)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax11: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin11: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto11: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_11: TPanel
+          Tag = 11
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin11: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel20: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel23: TPanel
+        Left = 1
+        Top = 342
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 12
+        object plAD10: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD10(J2-3)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax10: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin10: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP14'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto10: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_10: TPanel
+          Tag = 10
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin10: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel18: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel27: TPanel
+        Left = 1
+        Top = 311
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 11
+        object plAD9: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD09(J2-2)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax9: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin9: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP12'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto9: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_9: TPanel
+          Tag = 9
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin9: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel17: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel31: TPanel
+        Left = 1
+        Top = 280
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 10
+        object plAD8: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Hint = 'H'
+          Align = alLeft
+          Caption = 'AD08(J2-1)'
+          Color = clGradientActiveCaption
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax8: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '20.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin8: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto8: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_8: TPanel
+          Tag = 8
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin8: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '20.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel13: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel35: TPanel
+        Left = 1
+        Top = 249
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 9
+        object plAD7: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD07(J4-8)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax7: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin7: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP11'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto7: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_7: TPanel
+          Tag = 7
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin7: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel12: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel39: TPanel
+        Left = 1
+        Top = 218
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 8
+        object plAD6: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD06(J4-7)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax6: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin6: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP8'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto6: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_6: TPanel
+          Tag = 6
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin6: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel9: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel43: TPanel
+        Left = 1
+        Top = 187
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 7
+        object plAD5: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD05(J4-6)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax5: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin5: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP13'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto5: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_5: TPanel
+          Tag = 5
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin5: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel6: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel47: TPanel
+        Left = 1
+        Top = 156
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 6
+        object plAD4: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD04(J4-5)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax4: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin4: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP10'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto4: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_4: TPanel
+          Tag = 4
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin4: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel5: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel51: TPanel
+        Left = 1
+        Top = 125
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 5
+        object plAD3: TPanel
+          Tag = 3
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD03(J4-4)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax3: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin3: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP9'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto3: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_3: TPanel
+          Tag = 3
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin3: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel4: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel54: TPanel
+        Left = 1
+        Top = 94
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 4
+        object plAD2: TPanel
+          Tag = 2
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD02(J4-3)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax2: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin2: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP7'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto2: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_2: TPanel
+          Tag = 2
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMin2: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel3: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel57: TPanel
+        Left = 1
+        Top = 63
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 3
+        object plAD1: TPanel
+          Tag = 1
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD01(J4-2)'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMax1: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin1: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP6'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto1: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_1: TPanel
+          Tag = 1
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object Panel2: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 5
+        end
+        object edtADSetMin1: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 6
+          Text = '5.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+      end
+      object Panel60: TPanel
+        Left = 1
+        Top = 32
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 2
+        object plAD0: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Hint = 'H'
+          Align = alLeft
+          Caption = 'AD00(J4-1)'
+          Color = clGradientActiveCaption
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 0
+          OnClick = plAD0Click
+        end
+        object edtADSetMin0: TEdit
+          Left = 241
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 1
+          Text = '20.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object pl_pin0: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 2
+        end
+        object pl_Auto0: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Caption = 'V'
+          Color = clWhite
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'AR DELANEY'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+          OnClick = pl_Auto0Click
+        end
+        object pl_read_voltage_ad_0: TPanel
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+        object edtADSetMax0: TEdit
+          Left = 329
+          Top = 1
+          Width = 64
+          Height = 29
+          Align = alLeft
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 5
+          Text = '20.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object Panel1: TPanel
+          Left = 305
+          Top = 1
+          Width = 24
+          Height = 29
+          Align = alLeft
+          BevelOuter = bvNone
+          Caption = '~'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -20
+          Font.Name = 'Tahoma'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
+        end
+      end
+      object Panel63: TPanel
+        Left = 1
+        Top = 1
+        Width = 510
+        Height = 31
+        Align = alTop
+        TabOrder = 1
+        object Panel64: TPanel
+          Left = 33
+          Top = 1
+          Width = 120
+          Height = 29
+          Align = alLeft
+          Caption = 'AD(PIN)'
+          Color = clTeal
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 0
+        end
+        object Panel65: TPanel
+          Left = 241
+          Top = 1
+          Width = 152
+          Height = 29
+          Align = alLeft
+          Caption = 'Voltage ( V )'
+          Color = clTeal
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+        end
+        object Panel66: TPanel
+          Left = 153
+          Top = 1
+          Width = 88
+          Height = 29
+          Align = alLeft
+          Caption = 'TP'
+          Color = clTeal
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 2
+        end
+        object Panel8: TPanel
+          Left = 1
+          Top = 1
+          Width = 32
+          Height = 29
+          Align = alLeft
+          Color = clTeal
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 3
+        end
+        object Panel11: TPanel
+          Left = 393
+          Top = 1
+          Width = 116
+          Height = 29
+          Align = alClient
+          Caption = 'Read Value'
+          Color = clTeal
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 4
+        end
+      end
+      object Panel67: TPanel
+        Left = 1
+        Top = 497
+        Width = 510
+        Height = 35
+        Align = alClient
+        Color = clTeal
+        ParentBackground = False
+        TabOrder = 0
+        object Image3: TImage
+          Left = 1
+          Top = 1
+          Width = 17
+          Height = 33
+          Align = alLeft
+        end
+        object Label1: TLabel
+          Left = 18
+          Top = 1
+          Width = 491
+          Height = 33
+          Align = alClient
+          Alignment = taCenter
+          Caption = 'Powered By Power Supplier '
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -25
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentFont = False
+          ExplicitWidth = 289
+          ExplicitHeight = 29
+        end
+      end
+      object plPSU: TPanel
+        Left = 1
+        Top = 532
+        Width = 510
+        Height = 60
+        Align = alBottom
+        TabOrder = 18
+        object Panel73: TPanel
+          Left = 1
+          Top = 1
+          Width = 508
+          Height = 32
+          Align = alTop
+          TabOrder = 0
+          object Panel70: TPanel
+            Left = 1
+            Top = 1
+            Width = 100
+            Height = 30
+            Align = alLeft
+            Caption = 'VOLTAGE(V)'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -16
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+          end
+          object Panel69: TPanel
+            Left = 168
+            Top = 1
+            Width = 100
+            Height = 30
+            Align = alLeft
+            Caption = 'CURRENT(mA)'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+          end
+          object edtPSUVol: TEdit
+            Left = 101
+            Top = 1
+            Width = 67
+            Height = 30
+            Align = alLeft
+            Alignment = taCenter
+            Enabled = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -24
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ImeMode = imSAlpha
+            ParentFont = False
+            TabOrder = 2
+            Text = '5'
+            OnChange = edt_minChange
+            OnExit = edt_minExit
+            ExplicitHeight = 35
+          end
+          object edtPSUCur: TEdit
+            Left = 268
+            Top = 1
+            Width = 239
+            Height = 30
+            Align = alClient
+            Alignment = taCenter
+            Enabled = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -24
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ImeMode = imSAlpha
+            ParentFont = False
+            TabOrder = 3
+            Text = '200'
+            OnChange = edt_minChange
+            OnExit = edt_minExit
+            ExplicitHeight = 35
+          end
+        end
+        object Panel74: TPanel
+          Left = 1
+          Top = 33
+          Width = 508
+          Height = 32
+          Align = alTop
+          TabOrder = 1
+          object Panel75: TPanel
+            Left = 1
+            Top = 1
+            Width = 208
+            Height = 30
+            Align = alLeft
+            Caption = 'DUT  AverageCurrent (mA)'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -19
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+          end
+          object edt_min: TEdit
+            Tag = 5
+            Left = 209
+            Top = 1
+            Width = 122
+            Height = 30
+            Hint = '1'
+            Align = alLeft
+            Alignment = taCenter
+            Enabled = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -24
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ImeMode = imSAlpha
+            ParentFont = False
+            TabOrder = 1
+            Text = '170'
+            OnChange = edt_minChange
+            OnExit = edt_minExit
+            ExplicitHeight = 35
+          end
+          object edt_max: TEdit
+            Tag = 5
+            Left = 358
+            Top = 1
+            Width = 128
+            Height = 30
+            Hint = '2'
+            Align = alLeft
+            Alignment = taCenter
+            Enabled = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -24
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ImeMode = imSAlpha
+            ParentFont = False
+            TabOrder = 2
+            Text = '180'
+            OnChange = edt_minChange
+            OnExit = edt_minExit
+            ExplicitHeight = 35
+          end
+          object Panel16: TPanel
+            Tag = 1
+            Left = 331
+            Top = 1
+            Width = 27
+            Height = 30
+            Align = alLeft
+            BevelOuter = bvNone
+            Caption = '~'
+            Color = clWhite
+            Enabled = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -27
+            Font.Name = 'Times New Roman'
+            Font.Style = [fsBold]
+            ParentBackground = False
+            ParentFont = False
+            TabOrder = 3
+          end
+        end
+      end
+      object pl_sys_power: TPanel
+        Left = 1
+        Top = 592
+        Width = 510
+        Height = 46
+        Align = alBottom
+        Caption = 'System Power'
+        Color = clSkyBlue
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clBlack
+        Font.Height = -21
+        Font.Name = 'Times New Roman'
+        Font.Style = [fsBold]
+        ParentBackground = False
+        ParentFont = False
+        TabOrder = 19
+      end
+    end
+    object Panel68: TPanel
+      Left = 1
+      Top = 1
+      Width = 512
+      Height = 40
+      Align = alTop
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 1
+      object Panel71: TPanel
+        Left = 1
+        Top = 1
+        Width = 510
+        Height = 40
+        Align = alTop
+        TabOrder = 0
+        object edtPassWord: TEdit
+          Left = 1
+          Top = 1
+          Width = 383
+          Height = 38
+          Align = alClient
+          Alignment = taCenter
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          PasswordChar = '*'
+          TabOrder = 0
+          TextHint = 'PASSWORD'
+          OnEnter = edtPassWordEnter
+          ExplicitHeight = 39
+        end
+        object btnSet: TBitBtn
+          Left = 384
+          Top = 1
+          Width = 125
+          Height = 38
+          Align = alRight
+          Caption = 'Enter'
+          DoubleBuffered = True
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentDoubleBuffered = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = btnSetClick
+        end
+        object Panel72: TPanel
+          Left = 1
+          Top = 1
+          Width = 0
+          Height = 38
+          Align = alLeft
+          Color = clWhite
+          ParentBackground = False
+          TabOrder = 2
+          object cbDefault_Device: TComboBox
+            Left = 1
+            Top = 1
+            Width = 0
+            Height = 37
+            Align = alLeft
+            Style = csDropDownList
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBlue
+            Font.Height = -25
+            Font.Name = 'Times New Roman'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+            OnExit = cbDefault_DeviceExit
+            OnSelect = cbDefault_DeviceSelect
+          end
+        end
+      end
+    end
+    object pl_KValue: TPanel
+      Left = 513
+      Top = 41
+      Width = 0
+      Height = 639
+      Align = alRight
+      Color = clWhite
+      ParentBackground = False
+      TabOrder = 2
+      object Panel25: TPanel
+        Left = 1
+        Top = 1
+        Width = 125
+        Height = 31
+        Align = alTop
+        Caption = 'K Value'
+        Color = clTeal
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -24
+        Font.Name = 'Times New Roman'
+        Font.Style = []
+        ParentBackground = False
+        ParentFont = False
+        TabOrder = 0
+      end
+      object Panel26: TPanel
+        Left = 1
+        Top = 466
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 1
+        object edt_KValue_14: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_14: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel28: TPanel
+        Left = 1
+        Top = 435
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 2
+        object edt_KValue_13: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_13: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel30: TPanel
+        Left = 1
+        Top = 404
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 3
+        object edt_KValue_12: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_12: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel33: TPanel
+        Left = 1
+        Top = 373
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 4
+        object edt_KValue_11: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_11: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel36: TPanel
+        Left = 1
+        Top = 342
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 5
+        object edt_KValue_10: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_10: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel38: TPanel
+        Left = 1
+        Top = 311
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 6
+        object edt_KValue_9: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_9: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel41: TPanel
+        Left = 1
+        Top = 280
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 7
+        object edt_KValue_8: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_8: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel44: TPanel
+        Left = 1
+        Top = 249
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 8
+        object edt_KValue_7: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_7: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel46: TPanel
+        Left = 1
+        Top = 218
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 9
+        object edt_KValue_6: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_6: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel49: TPanel
+        Left = 1
+        Top = 187
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 10
+        object edt_KValue_5: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_5: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel52: TPanel
+        Left = 1
+        Top = 156
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 11
+        object edt_KValue_4: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_4: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel55: TPanel
+        Left = 1
+        Top = 125
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 12
+        object edt_KValue_3: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_3: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel58: TPanel
+        Left = 1
+        Top = 94
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 13
+        object edt_KValue_2: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_2: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel61: TPanel
+        Left = 1
+        Top = 63
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 14
+        object edt_KValue_1: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_1: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel76: TPanel
+        Left = 1
+        Top = 32
+        Width = 125
+        Height = 31
+        Align = alTop
+        TabOrder = 15
+        object edt_KValue_0: TEdit
+          Left = 27
+          Top = 1
+          Width = 97
+          Height = 29
+          Align = alClient
+          Alignment = taCenter
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlue
+          Font.Height = -24
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ImeMode = imSAlpha
+          ParentFont = False
+          TabOrder = 0
+          Text = '0.00'
+          OnChange = edtADSetMin0Change
+          OnExit = edtADSetMin0Exit
+          ExplicitHeight = 35
+        end
+        object plPN_0: TPanel
+          Tag = 1
+          Left = 1
+          Top = 1
+          Width = 26
+          Height = 29
+          Align = alLeft
+          Caption = '+'
+          Color = clWhite
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -27
+          Font.Name = 'Times New Roman'
+          Font.Style = []
+          ParentBackground = False
+          ParentFont = False
+          TabOrder = 1
+          OnClick = plPN_14Click
+        end
+      end
+      object Panel78: TPanel
+        Left = 1
+        Top = 497
+        Width = 125
+        Height = 141
+        Align = alClient
+        Caption = 'MTT'
+        Color = clTeal
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -40
+        Font.Name = 'Times New Roman'
+        Font.Style = []
+        ParentBackground = False
+        ParentFont = False
+        TabOrder = 16
+      end
+    end
+  end
+  object btnStart: TBitBtn
+    Left = 351
+    Top = 619
+    Width = 136
+    Height = 42
+    Caption = 'Start'
+    DoubleBuffered = True
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clBlue
+    Font.Height = -33
+    Font.Name = 'Times New Roman'
+    Font.Style = [fsBold]
+    ParentDoubleBuffered = False
+    ParentFont = False
+    TabOrder = 3
+    Visible = False
+    OnClick = btnStartClick
+  end
+  object ckbAuto: TCheckBox
+    Left = 186
+    Top = 619
+    Width = 159
+    Height = 42
+    Caption = 'DUT Plugin Auto Test'
+    Color = clCream
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -20
+    Font.Name = 'Times New Roman'
+    Font.Style = []
+    ParentColor = False
+    ParentFont = False
+    TabOrder = 4
+    Visible = False
+    OnClick = ckbAutoClick
+  end
+  object Timer1: TTimer
+    Enabled = False
+    Interval = 100
+    OnTimer = Timer1Timer
+    Left = 32
+    Top = 32
+  end
+end

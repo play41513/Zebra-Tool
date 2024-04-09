@@ -1,0 +1,33 @@
+//---------------------------------------------------------------------------
+
+#ifndef MessageBoxH
+#define MessageBoxH
+//---------------------------------------------------------------------------
+#include <Classes.hpp>
+#include <Controls.hpp>
+#include <StdCtrls.hpp>
+#include <Forms.hpp>
+#include <ExtCtrls.hpp>
+#include <Buttons.hpp>
+//---------------------------------------------------------------------------
+class TfrmMsg : public TForm
+{
+__published:	// IDE-managed Components
+	TPanel *plScreen;
+	TPanel *Panel4;
+	TBitBtn *btnScreenFail;
+	TPanel *plTitle;
+	TBitBtn *btnScreenOK;
+	void __fastcall btnScreenOKClick(TObject *Sender);
+	void __fastcall btnScreenOKKeyDown(TObject *Sender, WORD &Key, TShiftState Shift);
+	void __fastcall FormShow(TObject *Sender);
+
+
+private:	// User declarations
+public:		// User declarations
+	__fastcall TfrmMsg(TComponent* Owner);
+};
+//---------------------------------------------------------------------------
+extern PACKAGE TfrmMsg *frmMsg;
+//---------------------------------------------------------------------------
+#endif
